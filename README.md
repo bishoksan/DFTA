@@ -13,11 +13,12 @@ The input is a file containing an FTA
 
 The file is formatted as: 
 
-Final States q47 q5 .
+*Final States q47 q5 .
 
 Transitions.
+
 yblack(q1,q19) -> q22.
-yblack(q9,q9) -> q18.
+yblack(q9,q9) -> q18.*
 
 ##Reference
 An Optimised Algorithm for Determinisation and Completion of Finite Tree Automata.
