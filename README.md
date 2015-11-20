@@ -11,8 +11,14 @@ java -jar DFTA.jar
 ### Input
 The input is a file containing an FTA
 
-The file is formatted as: 
+An FTA is specified as:
 
+*Final States \< states separated by space \>.*
+*Transitions.*
+*functorName(\< states separated by comma \>) -> <state>.*
+
+
+For example: 
 *Final States q47 q5.*
 
 *Transitions.*
