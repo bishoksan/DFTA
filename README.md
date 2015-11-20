@@ -2,25 +2,22 @@
 DFTA implements an optimised algorithm for Determinisation and Completion of Finite Tree Automata.
 
 ## Finite Tree Automata (FTA) determinisation
+### Implementation
+DFTA is written in Java and is developed using Netbeans IDE (8.0.1) and uses JRE 8.
 
-Usage:
-java -jar DFTA.jar [-help][-h] 
+### Usage
+java -jar DFTA.jar 
 
-java -jar DFTA.jar <ftafile> [-text][-dc][-show][-any][-datalog][-o <outfile>]
+### Input
+The input is a file containing an FTA
 
--help, -h -- print this message and ignore any other arguments
+The file is formatted as: 
 
--text     -- use the textbook algorithm (default is optimised algorithm)
+Final States q47 q5 .
 
--any      -- compute complete DFTA (default is no completion)
-
--dc       -- compute don't cares (default is no don't cares). Option ignored if '-any' not present
-
--show     -- display output (default is no display)
-
--o <file> -- send output to file
-
--datalog  -- write output in Datalog format
+Transitions.
+yblack(q1,q19) -> q22.
+yblack(q9,q9) -> q18.
 
 ##Reference
 An Optimised Algorithm for Determinisation and Completion of Finite Tree Automata.
