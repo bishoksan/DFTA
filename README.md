@@ -20,6 +20,7 @@ An FTA is specified as:
 
 
 For example: 
+
 *Final States q47 q5.*
 
 *Transitions.*
