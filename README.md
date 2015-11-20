@@ -28,4 +28,4 @@ by John P. Gallagher, Mai Ajspur and Bishoksan Kafle.
 http://arxiv.org/abs/1511.03595
 
 ##Contact  
-jpg@ruc.dk
+John Gallagher (jpg@ruc.dk)
