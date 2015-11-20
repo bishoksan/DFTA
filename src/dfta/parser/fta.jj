@@ -1,0 +1,132 @@
+PARSER_BEGIN(FTAParser)
+
+package dfta.parser;
+
+import java.util.HashSet;
+
+public class FTAParser {
+public static HashSet transitions = new HashSet();
+public static HashSet finalStates = new HashSet();
+}
+
+PARSER_END(FTAParser)
+
+// Tokens
+
+SKIP :
+{ " " | "\t" | "\n" | "\r" }
+
+TOKEN : 
+{ 
+  <FINAL : "Final" > |
+  <STATES : "States" > |
+  <TRANSITIONS : "Transitions" > |
+  <LBRACE : "(" > |
+  <RBRACE : ")" > |
+  <LSQBRACE : "[" > |
+  <RSQBRACE : "]" > |
+  <VERTBAR : "|" > |
+  <UNDERSCORE : "_" > |
+  <COMMA : "," > |
+  <FULLSTOP : "." > |
+  <ARROW : "->" > |
+  <QUOTE : "'" > |
+  <BINOP :  "/" | "*" | ";"  | ":-"  | "^" | "=" > |
+  <ANYOP : "+" | "-" > 
+  
+}
+
+TOKEN :
+{
+  < NUMBER: ( ["1"-"9"] (["0"-"9"])* | "0" ) >
+  |
+  < DECIMALNUMBER: <NUMBER> <FULLSTOP> <NUMBER>  >
+}
+
+TOKEN : 
+{
+  
+< IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<UNDERSCORE>)* >
+|
+  < #LETTER:
+      (["A"-"Z"] | ["a"-"z"] | "_")
+  >
+|
+  < #DIGIT:
+      ["0"-"9"]    
+  >
+}
+
+TOKEN : 
+{
+< QIDENT: <QUOTE> (<NONQUOTE>)* (<QUOTE> <QUOTE> (<NONQUOTE>)* )* <QUOTE> >  |
+  <#NONQUOTE : ~["'","\n", "\r"] >
+}
+
+SPECIAL_TOKEN : 
+{
+  <SINGLE_LINE_COMMENT: "%" ([" "-"~"] )* ("\n" | "\r" | "\r\n") > |
+  <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" ("*" | (~["*","/"] (~["*"])* "*"))* "/">
+}
+
+
+// Grammar rules for FTA transitions
+
+void FTA() :
+{ }
+{ (FinalStates())? (<TRANSITIONS> <FULLSTOP>)? Delta() <EOF>
+}
+
+void FinalStates() :
+{ }
+{ <FINAL> <STATES> // Collect the final states in the HashSet finalStates
+ Ident() {finalStates.add(((NodeToken)n4.f0.choice).tokenImage);}
+ ( Ident() {finalStates.add(((NodeToken)n6.f0.choice).tokenImage);}
+ )*  <FULLSTOP>
+}
+
+void Delta() :
+{ }
+{(Transition() 
+ {transitions.add(n1);}  // Collect the transitions in the HashSet transitions
+ )* 
+}
+
+void Transition() :
+{}
+{
+  LHS() RHS() <FULLSTOP>
+  
+}
+
+void LHS() :
+{ }
+{ 
+  Ident() (<LBRACE> Ident() (<COMMA> Ident())* <RBRACE> <ARROW>  | 
+           <ARROW> |
+           <BINOP> Ident() <ARROW> |
+           <ANYOP> Ident() <ARROW> |
+           <COMMA> Ident() <ARROW> ) 
+ |
+  <NUMBER> <ARROW> 
+ |
+  <ANYOP> (<NUMBER> | Ident()) <ARROW> 
+ |
+  <LSQBRACE> (Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | 
+              <RSQBRACE> <ARROW>)  
+ |
+  <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW> 
+}
+
+void RHS() :
+{ }
+{
+  Ident()
+}
+
+void Ident() :
+{ }
+{
+  <IDENTIFIER> | <QIDENT>
+}
+
