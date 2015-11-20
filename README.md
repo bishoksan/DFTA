@@ -4,9 +4,9 @@ DFTA implements an optimised algorithm for Determinisation and Completion of Fin
 ## Finite Tree Automata (FTA) determinisation
 
 Usage:
-java -jar determinise.jar [-help][-h] 
+java -jar DFTA.jar [-help][-h] 
 
-java -jar determinise.jar <ftafile> [-text][-dc][-show][-any][-datalog][-o <outfile>]
+java -jar DFTA.jar <ftafile> [-text][-dc][-show][-any][-datalog][-o <outfile>]
 
 -help, -h -- print this message and ignore any other arguments
 
