@@ -15,7 +15,8 @@ An FTA is specified as:
 
 *Final States \< states separated by space \>.*
 *Transitions.*
-*functorName(\< states separated by comma \>) -> <state>.*
+
+*functorName(\< states separated by comma \>) -> \<state\>.*
 
 
 For example: 
