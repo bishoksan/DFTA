@@ -3,9 +3,9 @@ package dfta;
 import dfta.parser.*;
 import dfta.parser.syntaxtree.*;
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.io.PrintStream;
 import java.lang.Math.*;
@@ -16,24 +16,24 @@ public class DeterminiserOpt implements Determiniser {
     Indices idx;
     String ftaId;
 
-    HashSet<HashSet<String>> qd = new HashSet<HashSet<String>>();
+    LinkedHashSet<LinkedHashSet<String>> qd = new LinkedHashSet<LinkedHashSet<String>>();
     ArrayList<PTransition> deltad = new ArrayList<PTransition>();
 
-    HashMap<FuncSymb, ArrayList<HashMap<HashSet<FTATransition>, HashSet<HashSet<String>>>>> t_inverse_table
-            = new HashMap<FuncSymb, ArrayList<HashMap<HashSet<FTATransition>, HashSet<HashSet<String>>>>>();
-    HashMap<FuncSymb, ArrayList<HashSet<HashSet<FTATransition>>>> psi
-            = new HashMap<FuncSymb, ArrayList<HashSet<HashSet<FTATransition>>>>();
-    HashMap<FuncSymb, ArrayList<HashSet<FTATransition>>> psi_glb
-            = new HashMap<FuncSymb, ArrayList<HashSet<FTATransition>>>();
+    LinkedHashMap<FuncSymb, ArrayList<LinkedHashMap<LinkedHashSet<FTATransition>, LinkedHashSet<LinkedHashSet<String>>>>> t_inverse_table
+            = new LinkedHashMap<FuncSymb, ArrayList<LinkedHashMap<LinkedHashSet<FTATransition>, LinkedHashSet<LinkedHashSet<String>>>>>();
+    LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>> psi
+            = new LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>>();
+    LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<FTATransition>>> psi_glb
+            = new LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<FTATransition>>>();
 
     boolean dontCare = true;
     boolean any = false;
     boolean includesCheck = false;
 
-    HashSet<String> q1;
-    HashSet<String> q2;
+    LinkedHashSet<String> q1;
+    LinkedHashSet<String> q2;
 
-    public DeterminiserOpt(String ftaId, HashSet transitions, HashSet finalStates, boolean any, boolean dontCare) {
+    public DeterminiserOpt(String ftaId, LinkedHashSet transitions, LinkedHashSet finalStates, boolean any, boolean dontCare) {
         this.ftaId = ftaId;
         idx = new Indices(transitions, finalStates);
         this.any = any;
@@ -58,18 +58,18 @@ public class DeterminiserOpt implements Determiniser {
         System.out.println("Building DFTA states...");
         Iterator iter;
         int temp;
-        HashSet<String> q0 = new HashSet<String>();
+        LinkedHashSet<String> q0 = new LinkedHashSet<String>();
         FuncSymb f;
-        ArrayList<HashSet<HashSet<FTATransition>>> phi_f, psi_f;
-        HashSet<HashSet<FTATransition>> phi_f_j = new HashSet<HashSet<FTATransition>>();
-        ArrayList<ArrayList<HashSet<FTATransition>>> psi_phi_tuple;
-        ArrayList<HashSet<FTATransition>> deltatuple;
-        ArrayList<HashSet<FTATransition>> newtrs = new ArrayList<HashSet<FTATransition>>();
+        ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>> phi_f, psi_f;
+        LinkedHashSet<LinkedHashSet<FTATransition>> phi_f_j = new LinkedHashSet<LinkedHashSet<FTATransition>>();
+        ArrayList<ArrayList<LinkedHashSet<FTATransition>>> psi_phi_tuple;
+        ArrayList<LinkedHashSet<FTATransition>> deltatuple;
+        ArrayList<LinkedHashSet<FTATransition>> newtrs = new ArrayList<LinkedHashSet<FTATransition>>();
 
-        HashMap<FuncSymb, ArrayList<HashSet<HashSet<FTATransition>>>> phi
-                = new HashMap<FuncSymb, ArrayList<HashSet<HashSet<FTATransition>>>>();
+        LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>> phi
+                = new LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>>();
 
-        HashSet<HashSet<String>> qdnew, qdold, qdnew1;
+        LinkedHashSet<LinkedHashSet<String>> qdnew, qdold, qdnew1;
 
         iter = idx.sigma.iterator();
         while (iter.hasNext()) {
@@ -93,26 +93,26 @@ public class DeterminiserOpt implements Determiniser {
         while (iter.hasNext()) {
             f = (FuncSymb) iter.next();
             if (f.arity > 0) {
-                psi_glb.put(f, new ArrayList<HashSet<FTATransition>>());
-                psi_f = new ArrayList<HashSet<HashSet<FTATransition>>>(f.arity);
-                phi_f = new ArrayList<HashSet<HashSet<FTATransition>>>(f.arity);
-                t_inverse_table.put(f, new ArrayList<HashMap<HashSet<FTATransition>, HashSet<HashSet<String>>>>());
+                psi_glb.put(f, new ArrayList<LinkedHashSet<FTATransition>>());
+                psi_f = new ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>(f.arity);
+                phi_f = new ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>(f.arity);
+                t_inverse_table.put(f, new ArrayList<LinkedHashMap<LinkedHashSet<FTATransition>, LinkedHashSet<LinkedHashSet<String>>>>());
                 for (int j = 0; j < f.arity; j++) {
-                    psi_f.add(j, new HashSet<HashSet<FTATransition>>());
-                    phi_f.add(j, new HashSet<HashSet<FTATransition>>());
-                    t_inverse_table.get(f).add(j, new HashMap<HashSet<FTATransition>, HashSet<HashSet<String>>>());
-                    psi_glb.get(f).add(j, new HashSet<FTATransition>());
+                    psi_f.add(j, new LinkedHashSet<LinkedHashSet<FTATransition>>());
+                    phi_f.add(j, new LinkedHashSet<LinkedHashSet<FTATransition>>());
+                    t_inverse_table.get(f).add(j, new LinkedHashMap<LinkedHashSet<FTATransition>, LinkedHashSet<LinkedHashSet<String>>>());
+                    psi_glb.get(f).add(j, new LinkedHashSet<FTATransition>());
                 }
                 psi.put(f, psi_f);
                 phi.put(f, phi_f);
             }
         }
 
-        qdnew = (HashSet<HashSet<String>>) qd.clone();
-        deltatuple = new ArrayList<HashSet<FTATransition>>();
-        psi_phi_tuple = new ArrayList<ArrayList<HashSet<FTATransition>>>();
+        qdnew = (LinkedHashSet<LinkedHashSet<String>>) qd.clone();
+        deltatuple = new ArrayList<LinkedHashSet<FTATransition>>();
+        psi_phi_tuple = new ArrayList<ArrayList<LinkedHashSet<FTATransition>>>();
 
-        qdnew1 = new HashSet<HashSet<String>>();
+        qdnew1 = new LinkedHashSet<LinkedHashSet<String>>();
 
         // Compute DFTA States - main loop
         do {
@@ -134,13 +134,13 @@ public class DeterminiserOpt implements Determiniser {
 
                         //psi_f.get(j).addAll(phi_f_j);
                         l = phi_f_j.iterator();
-					//newtrs.add(j,new HashSet<FTATransition>());
+					//newtrs.add(j,new LinkedHashSet<FTATransition>());
                         //while(l.hasNext()) {
                         //	if (psi_glb.get(f).get(j).isEmpty())
-                        //		psi_glb.get(f).set(j,new HashSet<FTATransition>((HashSet<FTATransition>) l.next()));
+                        //		psi_glb.get(f).set(j,new LinkedHashSet<FTATransition>((LinkedHashSet<FTATransition>) l.next()));
                         //	else	
-                        //		psi_glb.get(f).get(j).retainAll((HashSet<FTATransition>) l.next());
-                        //	newtrs.get(j).addAll((HashSet<FTATransition>) l.next());
+                        //		psi_glb.get(f).get(j).retainAll((LinkedHashSet<FTATransition>) l.next());
+                        //	newtrs.get(j).addAll((LinkedHashSet<FTATransition>) l.next());
                         //}
                         //System.out.println(f+", "+j+": "+psi_glb.get(f).get(j));
                     }
@@ -149,12 +149,12 @@ public class DeterminiserOpt implements Determiniser {
                             psi_phi_tuple.clear();
                             for (int k = 0; k < f.arity; k++) {
                                 if (k < j) {
-                                    psi_phi_tuple.add(k, new ArrayList<HashSet<FTATransition>>(psi_f.get(k)));
+                                    psi_phi_tuple.add(k, new ArrayList<LinkedHashSet<FTATransition>>(psi_f.get(k)));
                                 } else if (k == j) {
-                                    psi_phi_tuple.add(k, new ArrayList<HashSet<FTATransition>>(phi_f.get(j)));
+                                    psi_phi_tuple.add(k, new ArrayList<LinkedHashSet<FTATransition>>(phi_f.get(j)));
                                 } //else psi_phi_tuple.add(k,pruneSets(psi_f.get(k),newtrs.get(j)));
                                 else {
-                                    psi_phi_tuple.add(k, new ArrayList<HashSet<FTATransition>>(phi_f.get(k)));
+                                    psi_phi_tuple.add(k, new ArrayList<LinkedHashSet<FTATransition>>(phi_f.get(k)));
                                     psi_phi_tuple.get(k).addAll(psi_f.get(k));
                                 }
                             }
@@ -165,10 +165,10 @@ public class DeterminiserOpt implements Determiniser {
                             }
 						//System.out.print("Cartesian product size: " + prod + " ");
 						/*
-                             HashSet<HashSet<FTATransition>> intersects = intersectCartProd(psi_phi_tuple,0);
+                             LinkedHashSet<LinkedHashSet<FTATransition>> intersects = intersectCartProd(psi_phi_tuple,0);
                              Iterator i = intersects.iterator();
                              while (i.hasNext()) {
-                             q0 = rhsSet((HashSet<FTATransition>) i.next());
+                             q0 = rhsSet((LinkedHashSet<FTATransition>) i.next());
                              if (qd.add(q0)) {
                              qdnew1.add(q0);
                              if (includesCheck) if (!inclusionCheckState(q0,q1,q2)) return false;
@@ -218,10 +218,10 @@ public class DeterminiserOpt implements Determiniser {
         System.out.println("Building DFTA product transitions...");
         Iterator i = idx.sigma.iterator();
         FuncSymb f;
-        HashSet<String> q0;
-        ArrayList<ArrayList<HashSet<FTATransition>>> psi_tuple;
-        ArrayList<HashSet<FTATransition>> deltatuple;
-        ArrayList<HashSet<HashSet<String>>> lhs;
+        LinkedHashSet<String> q0;
+        ArrayList<ArrayList<LinkedHashSet<FTATransition>>> psi_tuple;
+        ArrayList<LinkedHashSet<FTATransition>> deltatuple;
+        ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
         int temp;
 
         while (i.hasNext()) {
@@ -233,12 +233,12 @@ public class DeterminiserOpt implements Determiniser {
                 }
             } else {
                 //psi_reinit(f);
-                psi_tuple = new ArrayList<ArrayList<HashSet<FTATransition>>>();
+                psi_tuple = new ArrayList<ArrayList<LinkedHashSet<FTATransition>>>();
                 // Initialise delta-tuple and psi-tuple
-                deltatuple = new ArrayList<HashSet<FTATransition>>();
+                deltatuple = new ArrayList<LinkedHashSet<FTATransition>>();
                 for (int j = 0; j < f.arity; j++) {
-                    psi_tuple.add(j, new ArrayList<HashSet<FTATransition>>(psi.get(f).get(j)));
-                    deltatuple.add(j, new HashSet<FTATransition>());
+                    psi_tuple.add(j, new ArrayList<LinkedHashSet<FTATransition>>(psi.get(f).get(j)));
+                    deltatuple.add(j, new LinkedHashSet<FTATransition>());
                 }
 			// check for don't care arguments for functions of arity > 1
                 // remove such arguments from the psi-tuple
@@ -261,7 +261,7 @@ public class DeterminiserOpt implements Determiniser {
                     q0 = rhsSet(intersect(deltatuple));
 
                     if (!q0.isEmpty()) {
-                        lhs = new ArrayList<HashSet<HashSet<String>>>();
+                        lhs = new ArrayList<LinkedHashSet<LinkedHashSet<String>>>();
                         for (int m = 0; m < f.arity; m++) {
                             lhs.add(m, t_inverse_table.get(f).get(m).get(deltatuple.get(m)));
                         }
@@ -272,10 +272,10 @@ public class DeterminiserOpt implements Determiniser {
         }
     }
 
-    HashSet<String> rhsSet(HashSet<FTATransition> tSet) {
+    LinkedHashSet<String> rhsSet(LinkedHashSet<FTATransition> tSet) {
         Iterator i = tSet.iterator();
         FTATransition t;
-        HashSet<String> result = new HashSet<String>();
+        LinkedHashSet<String> result = new LinkedHashSet<String>();
         while (i.hasNext()) {
             t = (FTATransition) i.next();
             result.add(t.q0);
@@ -283,7 +283,7 @@ public class DeterminiserOpt implements Determiniser {
         return result;
     }
 
-    HashSet<FTATransition> intersect(ArrayList<HashSet<FTATransition>> d) {
+    LinkedHashSet<FTATransition> intersect(ArrayList<LinkedHashSet<FTATransition>> d) {
         int smallest = 0;
         int smallestSize = d.get(0).size();
         for (int i = 1; i < d.size(); i++) {
@@ -292,7 +292,7 @@ public class DeterminiserOpt implements Determiniser {
                 smallestSize = d.get(i).size();
             }
         }
-        HashSet<FTATransition> result = (HashSet<FTATransition>) d.get(smallest).clone();
+        LinkedHashSet<FTATransition> result = (LinkedHashSet<FTATransition>) d.get(smallest).clone();
         for (int i = 0; i < d.size(); i++) {
             if (i != smallest) {
                 result.retainAll(d.get(i));
@@ -302,13 +302,13 @@ public class DeterminiserOpt implements Determiniser {
         return result;
     }
 
-    HashSet<HashSet<FTATransition>> t(int i, FuncSymb f, HashSet<HashSet<String>> qss) {
+    LinkedHashSet<LinkedHashSet<FTATransition>> t(int i, FuncSymb f, LinkedHashSet<LinkedHashSet<String>> qss) {
         Iterator k = qss.iterator();
-        HashSet<HashSet<FTATransition>> result = new HashSet<HashSet<FTATransition>>();
-        HashSet<String> qs;
-        HashSet<FTATransition> h;
+        LinkedHashSet<LinkedHashSet<FTATransition>> result = new LinkedHashSet<LinkedHashSet<FTATransition>>();
+        LinkedHashSet<String> qs;
+        LinkedHashSet<FTATransition> h;
         while (k.hasNext()) {
-            qs = (HashSet<String>) k.next();
+            qs = (LinkedHashSet<String>) k.next();
             h = lhsSet(i, f, qs);
             if (!h.isEmpty()) {
                 result.add(h);
@@ -317,10 +317,10 @@ public class DeterminiserOpt implements Determiniser {
         return result;
     }
 
-    HashSet<FTATransition> lhsSet(int i, FuncSymb f, HashSet<String> qs) {
+    LinkedHashSet<FTATransition> lhsSet(int i, FuncSymb f, LinkedHashSet<String> qs) {
         Iterator k = qs.iterator();
-        HashSet<FTATransition> result = new HashSet<FTATransition>();
-        HashMap<String, HashSet<FTATransition>> lhsmap = idx.lhsf.get(f).get(i);
+        LinkedHashSet<FTATransition> result = new LinkedHashSet<FTATransition>();
+        LinkedHashMap<String, LinkedHashSet<FTATransition>> lhsmap = idx.lhsf.get(f).get(i);
         String q;
         while (k.hasNext()) {
             q = (String) k.next();
@@ -330,33 +330,33 @@ public class DeterminiserOpt implements Determiniser {
         }
         // Tabulate result for the t_inverse function
         if (!result.isEmpty()) {
-            HashMap<HashSet<FTATransition>, HashSet<HashSet<String>>> hm = t_inverse_table.get(f).get(i);
+            LinkedHashMap<LinkedHashSet<FTATransition>, LinkedHashSet<LinkedHashSet<String>>> hm = t_inverse_table.get(f).get(i);
             if (!hm.containsKey(result)) {
-                hm.put(result, new HashSet<HashSet<String>>());
+                hm.put(result, new LinkedHashSet<LinkedHashSet<String>>());
             }
             hm.get(result).add(qs);
         }
         return result;
     }
 
-    void dontCareArgs(ArrayList<ArrayList<HashSet<FTATransition>>> psi_tuple, FuncSymb f) {
-        HashSet<HashSet<String>> qs;
-        ArrayList<HashSet<FTATransition>> psiIntersectTuple = new ArrayList<HashSet<FTATransition>>();
-        HashSet<FTATransition> ts;
-        ArrayList<HashSet<HashSet<String>>> lhs = new ArrayList<HashSet<HashSet<String>>>();
-        HashSet<String> rhs;
-        HashSet<FTATransition> temp;
-        HashSet<FTATransition> deltaj;
-        ArrayList<HashSet<HashSet<FTATransition>>> dontCares = new ArrayList<HashSet<HashSet<FTATransition>>>();
+    void dontCareArgs(ArrayList<ArrayList<LinkedHashSet<FTATransition>>> psi_tuple, FuncSymb f) {
+        LinkedHashSet<LinkedHashSet<String>> qs;
+        ArrayList<LinkedHashSet<FTATransition>> psiIntersectTuple = new ArrayList<LinkedHashSet<FTATransition>>();
+        LinkedHashSet<FTATransition> ts;
+        ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs = new ArrayList<LinkedHashSet<LinkedHashSet<String>>>();
+        LinkedHashSet<String> rhs;
+        LinkedHashSet<FTATransition> temp;
+        LinkedHashSet<FTATransition> deltaj;
+        ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>> dontCares = new ArrayList<LinkedHashSet<LinkedHashSet<FTATransition>>>();
 
         // Intersect elements of psi-tuple and initialise don't-care array
         for (int i = 0; i < f.arity; i++) {
             if (!psi_tuple.get(i).isEmpty()) {
                 psiIntersectTuple.add(i, intersect(psi_tuple.get(i)));
             } else {
-                psiIntersectTuple.add(i, new HashSet<FTATransition>());
+                psiIntersectTuple.add(i, new LinkedHashSet<FTATransition>());
             }
-            dontCares.add(i, new HashSet<HashSet<FTATransition>>());
+            dontCares.add(i, new LinkedHashSet<LinkedHashSet<FTATransition>>());
         }
 
         for (int i = 0; i < f.arity; i++) {
@@ -367,9 +367,9 @@ public class DeterminiserOpt implements Determiniser {
                 rhs = rhsSet(deltaj);
                 if (rhs.equals(rhsSet(intersect(psiIntersectTuple)))) {
                     // generate a don't care transition
-                    lhs = new ArrayList<HashSet<HashSet<String>>>();
+                    lhs = new ArrayList<LinkedHashSet<LinkedHashSet<String>>>();
                     for (int k = 0; k < f.arity; k++) {
-                        lhs.add(k, new HashSet<HashSet<String>>());
+                        lhs.add(k, new LinkedHashSet<LinkedHashSet<String>>());
                         if (k == i) {
                             lhs.set(k, t_inverse_table.get(f).get(i).get(deltaj));
                         }
@@ -377,9 +377,9 @@ public class DeterminiserOpt implements Determiniser {
                     deltad.add(new PTransition(f, rhs, lhs));
                     dontCares.get(i).add(deltaj);
                 } else if (f.arity == 2 && isSingleton(rhs) && intersectsAll(deltaj, i, f, psi_tuple)) {
-                    lhs = new ArrayList<HashSet<HashSet<String>>>();
+                    lhs = new ArrayList<LinkedHashSet<LinkedHashSet<String>>>();
                     for (int k = 0; k < f.arity; k++) {
-                        lhs.add(k, new HashSet<HashSet<String>>());
+                        lhs.add(k, new LinkedHashSet<LinkedHashSet<String>>());
                         if (k == i) {
                             lhs.set(k, t_inverse_table.get(f).get(i).get(deltaj));
                         }
@@ -395,20 +395,20 @@ public class DeterminiserOpt implements Determiniser {
         }
     }
 
-    boolean isSingleton(HashSet<String> s) {
+    boolean isSingleton(LinkedHashSet<String> s) {
         return s.size() == 1;
     }
 
-    boolean intersectsAll(HashSet<FTATransition> deltaj, int j, FuncSymb f, ArrayList<ArrayList<HashSet<FTATransition>>> psi_tuple) {
+    boolean intersectsAll(LinkedHashSet<FTATransition> deltaj, int j, FuncSymb f, ArrayList<ArrayList<LinkedHashSet<FTATransition>>> psi_tuple) {
         // check whether deltaj intersects with all members of all non-j elements of psi_tuple
-        HashSet<FTATransition> ts;
+        LinkedHashSet<FTATransition> ts;
         for (int k = 0; k < f.arity; k++) {
             if (k != j) {
                 if (psi_tuple.get(k).isEmpty()) {
                     return false;
                 }
                 for (int l = 0; l < psi_tuple.get(k).size(); l++) {
-                    ts = (HashSet<FTATransition>) deltaj.clone();
+                    ts = (LinkedHashSet<FTATransition>) deltaj.clone();
                     ts.retainAll(psi_tuple.get(k).get(l));
                     if (ts.isEmpty()) {
                         return false;
@@ -422,26 +422,26 @@ public class DeterminiserOpt implements Determiniser {
 // check inclusion between states in the input FTA
     public boolean includes(String q1, String q2) {
         Iterator iter;
-        HashSet<String> q;
+        LinkedHashSet<String> q;
         boolean includes = true;
         iter = qd.iterator();
         while (iter.hasNext() && includes) {
-            q = (HashSet<String>) iter.next();
+            q = (LinkedHashSet<String>) iter.next();
             includes = includes && (!q.contains(q1) || q.contains(q2));
         }
         return includes;
     }
 
 // check inclusion between states in the input FTA
-    public boolean inclusionCheck(HashSet<String> q1, HashSet<String> q2) {
+    public boolean inclusionCheck(LinkedHashSet<String> q1, LinkedHashSet<String> q2) {
         Iterator iter, qiter1, qiter2;
         String x;
-        HashSet<String> q;
+        LinkedHashSet<String> q;
         boolean includes = true;
         boolean b;
         iter = qd.iterator();
         while (iter.hasNext() && includes) {
-            q = (HashSet<String>) iter.next();
+            q = (LinkedHashSet<String>) iter.next();
             qiter1 = q1.iterator();
             while (qiter1.hasNext()) {
                 x = (String) qiter1.next();
@@ -461,7 +461,7 @@ public class DeterminiserOpt implements Determiniser {
     }
 
 // check inclusion between states in the input FTA
-    public boolean inclusionCheckState(HashSet<String> q0, HashSet<String> q1, HashSet<String> q2) {
+    public boolean inclusionCheckState(LinkedHashSet<String> q0, LinkedHashSet<String> q1, LinkedHashSet<String> q2) {
         Iterator iter, qiter1, qiter2;
         String x;
         boolean includes = true;
@@ -495,7 +495,7 @@ public class DeterminiserOpt implements Determiniser {
         double tcount;
         double argsize;
         double qdsize = qd.size();
-        ArrayList<HashSet<HashSet<String>>> lhs;
+        ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
         for (int i = 0; i < deltad.size(); i++) {
             lhs = deltad.get(i).lhs;
             tcount = 1.0;
@@ -536,7 +536,7 @@ public class DeterminiserOpt implements Determiniser {
         System.out.println("=============================================");
     }
 
-    public HashSet<HashSet<String>> getQd() {
+    public LinkedHashSet<LinkedHashSet<String>> getQd() {
         return qd;
     }
 
@@ -552,19 +552,19 @@ public class DeterminiserOpt implements Determiniser {
         Iterator i;
         i = qd.iterator();
         while (i.hasNext()) {
-            System.out.println((HashSet<String>) i.next());
+            System.out.println((LinkedHashSet<String>) i.next());
         }
     }
 
-    ArrayList<HashSet<FTATransition>> pruneSets(HashSet<HashSet<FTATransition>> psi_f_k, HashSet<FTATransition> newtrs) {
-        ArrayList<HashSet<FTATransition>> result = new ArrayList<HashSet<FTATransition>>();
-        HashSet<FTATransition> set1, set2;
+    ArrayList<LinkedHashSet<FTATransition>> pruneSets(LinkedHashSet<LinkedHashSet<FTATransition>> psi_f_k, LinkedHashSet<FTATransition> newtrs) {
+        ArrayList<LinkedHashSet<FTATransition>> result = new ArrayList<LinkedHashSet<FTATransition>>();
+        LinkedHashSet<FTATransition> set1, set2;
         Iterator i = psi_f_k.iterator();
         int y = newtrs.size();
         System.out.print("Before " + psi_f_k.size() + " --- ");
         while (i.hasNext()) {
-            set1 = (HashSet<FTATransition>) i.next();
-            set2 = new HashSet<FTATransition>(newtrs);
+            set1 = (LinkedHashSet<FTATransition>) i.next();
+            set2 = new LinkedHashSet<FTATransition>(newtrs);
             set2.retainAll(set1);
             //System.out.print(set1.size()+"."+set2.size()+": ");
             if (!set2.isEmpty()) {
@@ -575,12 +575,12 @@ public class DeterminiserOpt implements Determiniser {
         return result;
     }
 
-    void prune(HashSet<HashSet<FTATransition>> psi_f_k) {
+    void prune(LinkedHashSet<LinkedHashSet<FTATransition>> psi_f_k) {
         Iterator i = psi_f_k.iterator();
-        HashSet<FTATransition> set1;
-        HashSet<String> r;
+        LinkedHashSet<FTATransition> set1;
+        LinkedHashSet<String> r;
         while (i.hasNext()) {
-            set1 = (HashSet<FTATransition>) i.next();
+            set1 = (LinkedHashSet<FTATransition>) i.next();
             r = rhsSet(set1);
             if (r.size() == 1) {
                 if (qd.contains(r)) {
@@ -599,21 +599,21 @@ public class DeterminiserOpt implements Determiniser {
 	//System.out.println("finished re-initializing psi values for "+f);
     }
 
-    HashSet<HashSet<FTATransition>> intersectCartProd(ArrayList<ArrayList<HashSet<FTATransition>>> psi_phi_tuple, int k) {
-        HashSet<HashSet<FTATransition>> result = new HashSet<HashSet<FTATransition>>();
-        HashSet<FTATransition> t;
+    LinkedHashSet<LinkedHashSet<FTATransition>> intersectCartProd(ArrayList<ArrayList<LinkedHashSet<FTATransition>>> psi_phi_tuple, int k) {
+        LinkedHashSet<LinkedHashSet<FTATransition>> result = new LinkedHashSet<LinkedHashSet<FTATransition>>();
+        LinkedHashSet<FTATransition> t;
         if (k == psi_phi_tuple.size() - 1) {
             for (int i = 0; i < psi_phi_tuple.get(k).size(); i++) {
-                result.add((HashSet<FTATransition>) (psi_phi_tuple.get(k).get(i)).clone());
+                result.add((LinkedHashSet<FTATransition>) (psi_phi_tuple.get(k).get(i)).clone());
             }
             return result;
         } else {
-            HashSet<HashSet<FTATransition>> r = intersectCartProd(psi_phi_tuple, k + 1);
+            LinkedHashSet<LinkedHashSet<FTATransition>> r = intersectCartProd(psi_phi_tuple, k + 1);
             Iterator i = r.iterator();
             while (i.hasNext()) {
-                t = (HashSet<FTATransition>) i.next();
+                t = (LinkedHashSet<FTATransition>) i.next();
                 for (int j = 0; j < psi_phi_tuple.get(k).size(); j++) {
-                    HashSet<FTATransition> u = (HashSet<FTATransition>) t.clone();
+                    LinkedHashSet<FTATransition> u = (LinkedHashSet<FTATransition>) t.clone();
                     u.retainAll(psi_phi_tuple.get(k).get(j));
                     if (!u.isEmpty()) {
                         result.add(u);

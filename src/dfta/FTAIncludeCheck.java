@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class FTAIncludeCheck {
 
@@ -30,8 +30,8 @@ public class FTAIncludeCheck {
             
 
 			t1.ReInit(new java.io.FileInputStream(args[1]));
-			t1.transitions = new HashSet();
-			t1.finalStates = new HashSet();
+			t1.transitions = new LinkedHashSet();
+			t1.finalStates = new LinkedHashSet();
             t1.FTA();
             fta2 = stripName(args[1])+":";
             det2 = new DeterminiserOpt(fta2,t1.transitions,t1.finalStates,false,false);

@@ -3,30 +3,29 @@ package dfta;
 import dfta.parser.*;
 import dfta.parser.syntaxtree.*;
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.Vector;
 
 public class Indices {
 
-HashSet transitions;
-HashSet finalStates;
-HashSet<FTATransition> delta = new HashSet<FTATransition>();
-HashSet<String> qs = new HashSet<String>();
-HashSet<String> qfs = new HashSet<String>();
+LinkedHashSet transitions;
+LinkedHashSet finalStates;
+LinkedHashSet<FTATransition> delta = new LinkedHashSet<FTATransition>();
+LinkedHashSet<String> qs = new LinkedHashSet<String>();
+LinkedHashSet<String> qfs = new LinkedHashSet<String>();
 
 Iterator iter;
 int transCount = 0;
 
-HashSet<FuncSymb> sigma = new HashSet<FuncSymb>();
-HashMap<FuncSymb, HashSet<FTATransition>> fIndex = new HashMap<FuncSymb, HashSet<FTATransition>>();
-HashMap<FTATransition,String> rhs = new HashMap<FTATransition,String>();
-HashMap<FuncSymb,ArrayList<HashMap<String,HashSet<FTATransition>>>> lhsf =
-	new HashMap<FuncSymb,ArrayList<HashMap<String,HashSet<FTATransition>>>>();
+LinkedHashSet<FuncSymb> sigma = new LinkedHashSet<FuncSymb>();
+LinkedHashMap<FuncSymb, LinkedHashSet<FTATransition>> fIndex = new LinkedHashMap<FuncSymb, LinkedHashSet<FTATransition>>();
+LinkedHashMap<FTATransition,String> rhs = new LinkedHashMap<FTATransition,String>();
+LinkedHashMap<FuncSymb,ArrayList<LinkedHashMap<String,LinkedHashSet<FTATransition>>>> lhsf =
+	new LinkedHashMap<FuncSymb,ArrayList<LinkedHashMap<String,LinkedHashSet<FTATransition>>>>();
 
-public Indices(HashSet inputTransitions, HashSet finalStates) {
+public Indices(LinkedHashSet inputTransitions, LinkedHashSet finalStates) {
 	 transitions = inputTransitions;
 	 this.finalStates = finalStates;
 }
@@ -70,7 +69,7 @@ void genFinalStates(String ftaId) {
 }
 
 void buildIndices() {
-	ArrayList<HashMap<String,HashSet<FTATransition>>> qmap;
+	ArrayList<LinkedHashMap<String,LinkedHashSet<FTATransition>>> qmap;
 	FTATransition t1;
 	FuncSymb fn;
 	String q;
@@ -85,21 +84,21 @@ void buildIndices() {
 		args = t1.lhs;
 		arity = fn.arity;
 		if (!fIndex.containsKey(fn)) {
-			fIndex.put(fn,new HashSet<FTATransition>());
+			fIndex.put(fn,new LinkedHashSet<FTATransition>());
 		}
 		fIndex.get(fn).add(t1);
 		rhs.put(t1,q);
 		if (!lhsf.containsKey(fn)) {
-			lhsf.put(fn,new ArrayList<HashMap<String,HashSet<FTATransition>>>());
+			lhsf.put(fn,new ArrayList<LinkedHashMap<String,LinkedHashSet<FTATransition>>>());
 			for (i=0; i<arity; i++) {
-				lhsf.get(fn).add(i, new HashMap<String,HashSet<FTATransition>>());
+				lhsf.get(fn).add(i, new LinkedHashMap<String,LinkedHashSet<FTATransition>>());
 			}
 		}
 		qmap = lhsf.get(fn);
 		for (i=0; i<arity; i++) {
 			q = args.get(i);
 			if (!qmap.get(i).containsKey(q)) {
-				qmap.get(i).put(q, new HashSet<FTATransition>());
+				qmap.get(i).put(q, new LinkedHashSet<FTATransition>());
 			}
 			qmap.get(i).get(q).add(t1);	
 		}
@@ -288,7 +287,7 @@ void showIndices() {
 			System.out.println("  "+j);
 			Iterator i1 = lhsf.get(f).get(j).keySet().iterator();
 			String q;
-			HashMap<String,HashSet<FTATransition>> fq = lhsf.get(f).get(j);
+			LinkedHashMap<String,LinkedHashSet<FTATransition>> fq = lhsf.get(f).get(j);
 			while (i1.hasNext()) {
 				q = (String) i1.next();
 				System.out.println("    "+q+"---"+fq.get(q).toString());

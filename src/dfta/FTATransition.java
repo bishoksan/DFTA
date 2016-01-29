@@ -1,6 +1,6 @@
 package dfta;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.ArrayList;
 
 public class FTATransition implements Comparable<FTATransition> {

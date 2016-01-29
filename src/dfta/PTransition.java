@@ -1,24 +1,24 @@
 package dfta;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.ArrayList;
 
 public class PTransition {
 
 FuncSymb f;
-HashSet<String> q0;
-ArrayList<HashSet<HashSet<String>>> lhs;
+LinkedHashSet<String> q0;
+ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
 
-public PTransition(FuncSymb f, HashSet<String> q0, ArrayList<HashSet<HashSet<String>>> lhs) {
+public PTransition(FuncSymb f, LinkedHashSet<String> q0, ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs) {
 	this.f=f;
 	this.q0=q0;
 	this.lhs=lhs;
 }
 
-public PTransition(FuncSymb f, HashSet<String> q0) {
+public PTransition(FuncSymb f, LinkedHashSet<String> q0) {
 	this.f=f;
 	this.q0=q0;
-	this.lhs=new ArrayList<HashSet<HashSet<String>>>();
+	this.lhs=new ArrayList<LinkedHashSet<LinkedHashSet<String>>>();
 }
 
 public String toString() {
