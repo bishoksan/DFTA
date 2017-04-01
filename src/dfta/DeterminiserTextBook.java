@@ -1,180 +1,251 @@
 package dfta;
 
-import dfta.parser.*;
-import dfta.parser.syntaxtree.*;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
+import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.io.PrintStream;
-import javax.swing.JTextArea;
 
 public class DeterminiserTextBook implements Determiniser {
 
-    Indices idx;
+   Indices idx;
+   boolean verbose;
 
-    LinkedHashSet<LinkedHashSet<String>> qd = new LinkedHashSet<LinkedHashSet<String>>();
-    ArrayList<DTransition> deltad = new ArrayList<DTransition>();
+   HashSet<HashSet<String>> qd = new HashSet<>();
+   ArrayList<DTransition> deltad = new ArrayList<>();
 
-    public DeterminiserTextBook(LinkedHashSet transitions, LinkedHashSet finalStates, boolean any) {
-        idx = new Indices(transitions, finalStates);
-        idx.genDelta("");
-        idx.genFinalStates("");
-        if (any) {
-            idx.genDeltaAny();
-        }
-        idx.buildIndices();
-    }
+   public DeterminiserTextBook(HashSet transitions, HashSet finalStates, boolean any, boolean verbose) {
+      idx = new Indices(transitions, finalStates);
+      idx.genDelta("");
+      idx.genFinalStates("");
+      if (any) {
+         idx.genDeltaAny();
+      }
+      idx.buildIndices();
+      this.verbose = verbose;
+   }
 
-    public void makeDfta() {
-        dftaStates();
-    }
+   @Override
+   public void makeDfta() {
+      dftaStates();
+   }
 
-    void dftaStates() {
-        System.out.println("Building DFTA ...");
-        Iterator iter;
-        int temp;
-        LinkedHashSet<String> q0 = new LinkedHashSet<String>();
-        FuncSymb f;
-        ArrayList<LinkedHashSet<String>> qtuple;
-        ArrayList<LinkedHashSet<FTATransition>> deltatuple;
+   void dftaStates() {
+      if (verbose) {
+         System.out.println("Building DFTA ...");
+      }
+      Iterator iter;
+      int temp;
+      HashSet<String> q0;
+      FuncSymb f;
+      ArrayList<HashSet<String>> qtuple;
+      ArrayList<BitSet> deltatuple;
 
-        LinkedHashSet<LinkedHashSet<String>> qdold;
-        ArrayList<ArrayList<LinkedHashSet<String>>> qdoldarray;
-        boolean newTransition;
+      HashSet<HashSet<String>> qdold;
+      ArrayList<ArrayList<HashSet<String>>> qdoldarray;
+      boolean newTransition;
 
-        // Compute DFTA States - main loop
-        do {
-            newTransition = false;
-            qdold = (LinkedHashSet<LinkedHashSet<String>>) qd.clone();
+      // Compute DFTA States - main loop
+      do {
+         newTransition = false;
+         qdold = (HashSet<HashSet<String>>) qd.clone();
 
-            iter = idx.sigma.iterator();
-            while (iter.hasNext()) {
-                f = (FuncSymb) iter.next();
-                //System.out.println(f.toString());
-                if (f.arity == 0) {
-                    q0 = rhsSet(idx.fIndex.get(f));
-                    if (!q0.isEmpty()) {
-                        qd.add(q0);
-                        newTransition |= addTransition(f, q0, new ArrayList<LinkedHashSet<String>>());
-                    }
-                } else {
-                    qdoldarray = new ArrayList<ArrayList<LinkedHashSet<String>>>();
-                    for (int i = 0; i < f.arity; i++) {
-                        qdoldarray.add(i, new ArrayList<LinkedHashSet<String>>(qdold));
-                    }
-                    int prod = 1;
-                    for (int k = 0; k < f.arity; k++) {
-                        prod = prod * qdold.size();
-                    }
-                    for (int k = 0; k < prod; k++) { // enumerate the delta-tuples
-                        temp = k;
-                        // Initialise new q-tuple and delta-tuple
-                        qtuple = new ArrayList<LinkedHashSet<String>>();
-                        deltatuple = new ArrayList<LinkedHashSet<FTATransition>>();
+         iter = idx.sigma.iterator();
+         while (iter.hasNext()) {
+            f = (FuncSymb) iter.next();
+            if (f.arity == 0) {
+               q0 = rhsSet(idx.fIndex.get(f));
+               if (!q0.isEmpty()) {
+                  qd.add(q0);
+                  newTransition |= addTransition(f, q0, new ArrayList<>());
+               }
+            } else {
+               qdoldarray = new ArrayList<>();
+               for (int i = 0; i < f.arity; i++) {
+                  qdoldarray.add(i, new ArrayList<>(qdold));
+               }
+               int prod = 1;
+               for (int k = 0; k < f.arity; k++) {
+                  prod = prod * qdold.size();
+               }
+               for (int k = 0; k < prod; k++) { // enumerate the delta-tuples
+                  temp = k;
+                  // Initialise new q-tuple and delta-tuple
+                  qtuple = new ArrayList<>();
+                  deltatuple = new ArrayList<>();
 
-                        for (int m = 0; m < f.arity; m++) {
-                            qtuple.add(m, qdoldarray.get(m).get(temp % qdoldarray.get(m).size()));
-                            deltatuple.add(m, lhsSet(m, f, qtuple.get(m)));
-                            temp = temp / qdoldarray.get(m).size();
-                        }
-                        q0 = rhsSet(intersect(deltatuple));
-                        if (!q0.isEmpty()) {
-                            qd.add(q0);
-                            newTransition |= addTransition(f, q0, qtuple);
-                            DTransition d = new DTransition(f, q0, qtuple);
-                        }
-                    }
-                }
+                  for (int m = 0; m < f.arity; m++) {
+                     qtuple.add(m, qdoldarray.get(m).get(temp % qdoldarray.get(m).size()));
+                     deltatuple.add(m, lhsSet(m, f, qtuple.get(m)));
+                     temp = temp / qdoldarray.get(m).size();
+                  }
+                  q0 = rhsSet(intersect(deltatuple));
+                  if (!q0.isEmpty()) {
+                     qd.add(q0);
+                     newTransition |= addTransition(f, q0, qtuple);
+                     DTransition d = new DTransition(f, q0, qtuple);
+                  }
+               }
             }
-        } while (newTransition);
-    }
+         }
+      } while (newTransition);
+   }
 
-    LinkedHashSet<String> rhsSet(LinkedHashSet<FTATransition> tSet) {
-        Iterator i = tSet.iterator();
-        FTATransition t;
-        LinkedHashSet<String> result = new LinkedHashSet<String>();
-        while (i.hasNext()) {
-            t = (FTATransition) i.next();
-            result.add(t.q0);
-        }
-        return result;
-    }
+   HashSet<String> rhsSet(BitSet tSet) {
+      FTATransition t;
+      HashSet<String> result = new HashSet<>();
+      for (int i = tSet.nextSetBit(0); i >= 0; i = tSet.nextSetBit(i + 1)) {
+         t = idx.tindex.get(i + 1);
+         result.add(t.q0);
+      }
+      return result;
+   }
 
-    LinkedHashSet<FTATransition> intersect(ArrayList<LinkedHashSet<FTATransition>> d) {
-        LinkedHashSet<FTATransition> result = (LinkedHashSet<FTATransition>) d.get(0).clone();
-        for (int i = 1; i < d.size(); i++) {
-            result.retainAll(d.get(i));
-        }
-        return result;
-    }
+   BitSet intersect(ArrayList<BitSet> d) {
+      BitSet result = (BitSet) d.get(0).clone();
+      for (int i = 1; i < d.size(); i++) {
+         result.and(d.get(i));
+      }
+      return result;
+   }
 
-    LinkedHashSet<FTATransition> lhsSet(int i, FuncSymb f, LinkedHashSet<String> qs) {
-        Iterator k = qs.iterator();
-        LinkedHashSet<FTATransition> result = new LinkedHashSet<FTATransition>();
-        LinkedHashMap<String, LinkedHashSet<FTATransition>> lhsmap = idx.lhsf.get(f).get(i);
-        String q;
-        while (k.hasNext()) {
-            q = (String) k.next();
-            if (lhsmap.containsKey(q)) {
-                result.addAll(lhsmap.get(q));
-            }
-        }
-        return result;
-    }
+   BitSet lhsSet(int i, FuncSymb f, HashSet<String> qs) {
+      Iterator k = qs.iterator();
+      BitSet result = new BitSet();
+      HashMap<String, BitSet> lhsmap = idx.lhsf.get(f).get(i);
+      String q;
+      while (k.hasNext()) {
+         q = (String) k.next();
+         if (lhsmap.containsKey(q)) {
+            result.or(lhsmap.get(q));
+         }
+      }
+      return result;
+   }
 
-    boolean addTransition(FuncSymb f, LinkedHashSet<String> q0, ArrayList<LinkedHashSet<String>> lhs) {
-        DTransition d1;
-        for (int i = 0; i < deltad.size(); i++) {
-            d1 = deltad.get(i);
-            if (d1.f.equals(f)
-                    && d1.lhs.equals(lhs)
-                    && d1.q0.equals(q0)) {
-                return false;
-            }
-        }
-        deltad.add(new DTransition(f, q0, lhs));
-        return true;
-    }
+   boolean addTransition(FuncSymb f, HashSet<String> q0, ArrayList<HashSet<String>> lhs) {
+      DTransition d1;
+      for (DTransition deltad1 : deltad) {
+         d1 = deltad1;
+         if (d1.f.equals(f)
+                 && d1.lhs.equals(lhs)
+                 && d1.q0.equals(q0)) {
+            return false;
+         }
+      }
+      deltad.add(new DTransition(f, q0, lhs));
+      return true;
+   }
 
 // check inclusion between states in the input FTA
-    public boolean includes(String q1, String q2) {
-        Iterator iter;
-        LinkedHashSet<String> q;
-        boolean includes = true;
-        iter = qd.iterator();
-        while (iter.hasNext() && includes) {
-            q = (LinkedHashSet<String>) iter.next();
-            includes = includes && (!q.contains(q1) || q.contains(q2));
-        }
-        return includes;
-    }
+   @Override
+   public boolean includes(String q1, String q2) {
+      Iterator iter;
+      HashSet<String> q;
+      boolean includes = true;
+      iter = qd.iterator();
+      while (iter.hasNext() && includes) {
+         q = (HashSet<String>) iter.next();
+         includes = includes && (!q.contains(q1) || q.contains(q2));
+      }
+      return includes;
+   }
 
-    public void printDfta(PrintStream output) {
-        for (int i = 0; i < deltad.size(); i++) {
-            output.println(deltad.get(i).toString() + ".");
-        }
-    }
+   /**
+    *
+    * @param output
+    * @param output1
+    */
+   @Override
+   public void printDfta(PrintStream output,PrintStream output1) {
+      output.println();
+      deltad.stream().forEach((deltad1) -> {
+         output.println(deltad1.toString() + ".");
+      });
+   }
 
-    public void showStats(JTextArea ja) {
+   @Override
+   public void printDftaDatalog(PrintStream output) {
+      DTransition t;
+      FuncSymb f;
+      HashSet<String> q0;
+      int n;
 
-        ja.append("Number of input FTA states = " + idx.qs.size() + "\n");
-        ja.append("Number of input FTA transitions = " + idx.delta.size() + "\n");
-        ja.append("Number of DFTA states = " + qd.size() + "\n");
-        ja.append("Number of DFTA transitions = " + deltad.size() + "\n");
-    }
+      ArrayList<HashSet<String>> lhs;
+      ArrayList<String> args;
+      HashMap<HashSet<String>, String> stateNames = new HashMap<>();
+      String head, body;
 
-    public LinkedHashSet<LinkedHashSet<String>> getQd() {
-        return qd;
-    }
+      // make state names q0, q1,... from elements of qd
+      // print dictionary of state names as comments
+      Iterator iter = qd.iterator();
+      Iterator iter1;
+      HashSet<String> q;
+      int j = 0;
+      output.println();
+      while (iter.hasNext()) {
+         q = (HashSet<String>) iter.next();
+         stateNames.put(q, "qq" + j);
+         j++;
+         output.println("### " + q + " --> " + stateNames.get(q));
+      }
+      output.println();
 
-    public ArrayList<DTransition> getDeltad() {
-        return deltad;
-    }
+      // print transitions as datalog clauses
+      for (DTransition deltad1 : deltad) {
+         t = deltad1;
+         f = t.f;
+         lhs = t.lhs;
+         q0 = t.q0;
+         args = new ArrayList<>();
+         for (int m = 0; m < lhs.size(); m++) {
+            args.add(m, stateNames.get(lhs.get(m)));
+         }
+         head = f.datalogName() + "(";
+         for (String arg : args) {
+            head += arg + ",";
+         }
+         head += stateNames.get(q0) + ")";
+         output.println(head + ".");
+      }
+   }
 
-    public Indices getIdx() {
-        return idx;
-    }
+   @Override
+   public void showStats(boolean verbose) {
+      if (verbose) {
+         System.out.println();
+         System.out.print("Number of input FTA states = ");
+      }
+      System.out.print(idx.qs.size() + ", ");
+      if (verbose) {
+         System.out.println();
+         System.out.print("Number of input FTA transitions = ");
+      }
+      System.out.print(idx.delta.size() + ", ");
+      if (verbose) {
+         System.out.println();
+         System.out.print("Number of DFTA states = ");
+      }
+      System.out.print(qd.size() + ", ");
+      if (verbose) {
+         System.out.println();
+         System.out.print("Number of DFTA transitions = ");
+      }
+      System.out.print(deltad.size() + ", ");
+   }
+
+   public HashSet<HashSet<String>> getQd() {
+      return qd;
+   }
+
+   public ArrayList<DTransition> getDeltad() {
+      return deltad;
+   }
+
+   @Override
+   public Indices getIdx() {
+      return idx;
+   }
 
 }

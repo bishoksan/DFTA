@@ -2,11 +2,11 @@ PARSER_BEGIN(FTAParser)
 
 package dfta.parser;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class FTAParser {
-public static HashSet transitions = new HashSet();
-public static HashSet finalStates = new HashSet();
+public static LinkedHashSet transitions = new LinkedHashSet();
+public static LinkedHashSet finalStates = new LinkedHashSet();
 }
 
 PARSER_END(FTAParser)
@@ -79,7 +79,7 @@ void FTA() :
 
 void FinalStates() :
 { }
-{ <FINAL> <STATES> // Collect the final states in the HashSet finalStates
+{ <FINAL> <STATES> // Collect the final states in the LinkedHashSet finalStates
  Ident() {finalStates.add(((NodeToken)n4.f0.choice).tokenImage);}
  ( Ident() {finalStates.add(((NodeToken)n6.f0.choice).tokenImage);}
  )*  <FULLSTOP>
@@ -88,7 +88,7 @@ void FinalStates() :
 void Delta() :
 { }
 {(Transition() 
- {transitions.add(n1);}  // Collect the transitions in the HashSet transitions
+ {transitions.add(n1);}  // Collect the transitions in the LinkedHashSet transitions
  )* 
 }
 

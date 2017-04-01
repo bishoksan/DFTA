@@ -7,15 +7,15 @@
 PARSER_BEGIN(FTAParser)
 package dfta.parser;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import dfta.parser.syntaxtree.*;
 import java.util.Vector;
 
 
 public class FTAParser 
 {
-   public static HashSet transitions = new HashSet();
-   public static HashSet finalStates = new HashSet();
+   public static LinkedHashSet transitions = new LinkedHashSet();
+   public static LinkedHashSet finalStates = new LinkedHashSet();
 }
 
 class JTBToolkit {
