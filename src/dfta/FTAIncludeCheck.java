@@ -3,6 +3,7 @@ package dfta;
 import dfta.parser.*;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public class FTAIncludeCheck {
 
@@ -37,8 +38,8 @@ public class FTAIncludeCheck {
 
          inputFile2 = args[1];
          FTAParser.ReInit(new java.io.FileInputStream(inputFile2));
-         FTAParser.transitions = new HashSet();
-         FTAParser.finalStates = new HashSet();
+         FTAParser.transitions = new LinkedHashSet();
+         FTAParser.finalStates = new LinkedHashSet();
          FTAParser.FTA();
          fta2 = stripName(args[1]) + ":";
          det2 = new DeterminiserOpt(fta2, FTAParser.transitions, FTAParser.finalStates, false, false, verbose);

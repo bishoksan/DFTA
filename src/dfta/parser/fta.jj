@@ -9,6 +9,7 @@ public static LinkedHashSet transitions = new LinkedHashSet();
 public static LinkedHashSet finalStates = new LinkedHashSet();
 }
 
+
 PARSER_END(FTAParser)
 
 // Tokens
@@ -21,6 +22,8 @@ TOKEN :
   <FINAL : "Final" > |
   <STATES : "States" > |
   <TRANSITIONS : "Transitions" > |
+  <AUTOMATON : "Automaton" > |
+  <OPS : "Ops" > |
   <LBRACE : "(" > |
   <RBRACE : ")" > |
   <LSQBRACE : "[" > |
@@ -28,6 +31,7 @@ TOKEN :
   <VERTBAR : "|" > |
   <UNDERSCORE : "_" > |
   <COMMA : "," > |
+  <COLON : ":" > |
   <FULLSTOP : "." > |
   <ARROW : "->" > |
   <QUOTE : "'" > |
@@ -43,13 +47,14 @@ TOKEN :
   < DECIMALNUMBER: <NUMBER> <FULLSTOP> <NUMBER>  >
 }
 
+
 TOKEN : 
 {
   
 < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>|<UNDERSCORE>)* >
 |
   < #LETTER:
-      (["A"-"Z"] | ["a"-"z"] | "_")
+      (["A"-"Z"] | ["a"-"z"] )
   >
 |
   < #DIGIT:
@@ -57,11 +62,16 @@ TOKEN :
   >
 }
 
+
+
+
 TOKEN : 
 {
 < QIDENT: <QUOTE> (<NONQUOTE>)* (<QUOTE> <QUOTE> (<NONQUOTE>)* )* <QUOTE> >  |
   <#NONQUOTE : ~["'","\n", "\r"] >
 }
+
+
 
 SPECIAL_TOKEN : 
 {
@@ -70,11 +80,73 @@ SPECIAL_TOKEN :
 }
 
 
-// Grammar rules for FTA transitions
+// Timbuk syntax rules for FTA transitions
+/************************************
+  
+  <file>            : 'Ops' <label_list> <automaton>
 
+  <label_list>      : <label_decl> <label_decl> ... // a list of label declarations
+
+  <label_decl>      : string ':' int // a symbol declaration (the name and the arity)
+
+  <automaton>       : 'Automaton' string 'States' <state_list> 'Final States' <state_list> 'Transitions' <transition_list>
+
+  <state_list>      : <state> <state> ... // a list of states
+
+  <state>           : string // the name of a state
+
+  <transition_list> : <transition> <transition> ... // a list of transitions
+
+  <transition>      : <label> '(' <state> ',' <state> ',' ... ')' '->' <state> // a transition
+
+  <label>           : string // the name of a label
+  
+************************************/
+
+// Parse FTA in either Timbuk syntax or Prolog syntax
 void FTA() :
 { }
-{ (FinalStates())? (<TRANSITIONS> <FULLSTOP>)? Delta() <EOF>
+{ (	TimbukFTA() |
+ 	PrologFTA() )
+}
+
+/********* Timbuk *********/
+
+void TimbukFTA() :
+{ }
+{ OpsDecls() Automaton() States() FinalStates() TimbukTransitions() <EOF>
+}
+
+void OpsDecls() :
+{ }
+{ <OPS> LabelList() 
+}
+
+void LabelList() :
+{ }
+{ (LabelDecl())* 
+}
+
+void LabelDecl() :
+{ }
+{ 
+ <IDENTIFIER> <COLON> <NUMBER>
+}
+
+void Automaton() :
+{ }
+{ <AUTOMATON> <IDENTIFIER> 
+}
+
+
+void States() :
+{ }
+{ <STATES> StateList() 
+}
+
+void StateList() :
+{ }
+{ (Ident())* 
 }
 
 void FinalStates() :
@@ -82,27 +154,68 @@ void FinalStates() :
 { <FINAL> <STATES> // Collect the final states in the LinkedHashSet finalStates
  Ident() {finalStates.add(((NodeToken)n4.f0.choice).tokenImage);}
  ( Ident() {finalStates.add(((NodeToken)n6.f0.choice).tokenImage);}
- )*  <FULLSTOP>
+ )*  
 }
 
-void Delta() :
+void TimbukTransitions() :
+{ }
+{ <TRANSITIONS> TimbukTransitionList() 
+}
+
+void TimbukTransitionList() :
 { }
 {(Transition() 
  {transitions.add(n1);}  // Collect the transitions in the LinkedHashSet transitions
  )* 
 }
 
+
+/********* end Timbuk *********/
+
+/********* Prolog *********/
+
+void PrologFTA() :
+{ }
+{ (PrologFinalStates())? (<TRANSITIONS> <FULLSTOP>)? PrologTransitions() <EOF>
+}
+
+void PrologFinalStates() :
+{ }
+{ <FINAL> <STATES> // Collect the final states in the HashSet finalStates
+ Ident() {finalStates.add(((NodeToken)n4.f0.choice).tokenImage);}
+ ( Ident() {finalStates.add(((NodeToken)n6.f0.choice).tokenImage);}
+ )*  <FULLSTOP>
+}
+
+void PrologTransitions() :
+{ }
+{(Transition() <FULLSTOP>
+ {transitions.add(n2);}  // Collect the transitions in the HashSet transitions
+ )* 
+}
+
+
+/********* end Prolog *********/
+
+/********* Common non-terminals *********/
+
 void Transition() :
 {}
 {
-  LHS() RHS() <FULLSTOP>
-  
+  LHS() RHS() 
+}
+
+void RHS() :
+{ }
+{
+  Ident()
 }
 
 void LHS() :
 { }
 { 
-  Ident() (<LBRACE> Ident() (<COMMA> Ident())* <RBRACE> <ARROW>  | 
+  Ident() (
+		   <LBRACE> (Ident() (<COMMA> Ident())*)? <RBRACE> <ARROW>  | 
            <ARROW> |
            <BINOP> Ident() <ARROW> |
            <ANYOP> Ident() <ARROW> |
@@ -118,15 +231,9 @@ void LHS() :
   <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW> 
 }
 
-void RHS() :
-{ }
-{
-  Ident()
-}
 
 void Ident() :
 { }
-{
-  <IDENTIFIER> | <QIDENT>
+{ 
+ <IDENTIFIER> | <QIDENT>
 }
-

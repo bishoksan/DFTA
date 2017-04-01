@@ -6,29 +6,13 @@ package dfta.parser.syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> ( FinalStates() )?
- * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
- * f2 -> Delta()
- * f3 -> <EOF>
+ * f0 -> ( TimbukFTA() | PrologFTA() )
  */
 public class FTA implements Node {
-   public NodeOptional f0;
-   public NodeOptional f1;
-   public Delta f2;
-   public NodeToken f3;
+   public NodeChoice f0;
 
-   public FTA(NodeOptional n0, NodeOptional n1, Delta n2, NodeToken n3) {
+   public FTA(NodeChoice n0) {
       f0 = n0;
-      f1 = n1;
-      f2 = n2;
-      f3 = n3;
-   }
-
-   public FTA(NodeOptional n0, NodeOptional n1, Delta n2) {
-      f0 = n0;
-      f1 = n1;
-      f2 = n2;
-      f3 = new NodeToken("");
    }
 
    public void accept(dfta.parser.visitor.Visitor v) {

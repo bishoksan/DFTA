@@ -62,12 +62,139 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    //
 
    /**
-    * f0 -> ( FinalStates() )?
-    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
-    * f2 -> Delta()
-    * f3 -> <EOF>
+    * f0 -> ( TimbukFTA() | PrologFTA() )
     */
    public R visit(FTA n) {
+      R _ret=null;
+      n.f0.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> OpsDecls()
+    * f1 -> Automaton()
+    * f2 -> States()
+    * f3 -> FinalStates()
+    * f4 -> TimbukTransitions()
+    * f5 -> <EOF>
+    */
+   public R visit(TimbukFTA n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      n.f4.accept(this);
+      n.f5.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <OPS>
+    * f1 -> LabelList()
+    */
+   public R visit(OpsDecls n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> ( LabelDecl() )*
+    */
+   public R visit(LabelList n) {
+      R _ret=null;
+      n.f0.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <IDENTIFIER>
+    * f1 -> <COLON>
+    * f2 -> <NUMBER>
+    */
+   public R visit(LabelDecl n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <AUTOMATON>
+    * f1 -> <IDENTIFIER>
+    */
+   public R visit(Automaton n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <STATES>
+    * f1 -> StateList()
+    */
+   public R visit(States n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> ( Ident() )*
+    */
+   public R visit(StateList n) {
+      R _ret=null;
+      n.f0.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <FINAL>
+    * f1 -> <STATES>
+    * f2 -> Ident()
+    * f3 -> ( Ident() )*
+    */
+   public R visit(FinalStates n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      n.f2.accept(this);
+      n.f3.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> <TRANSITIONS>
+    * f1 -> TimbukTransitionList()
+    */
+   public R visit(TimbukTransitions n) {
+      R _ret=null;
+      n.f0.accept(this);
+      n.f1.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> ( Transition() )*
+    */
+   public R visit(TimbukTransitionList n) {
+      R _ret=null;
+      n.f0.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> ( PrologFinalStates() )?
+    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
+    * f2 -> PrologTransitions()
+    * f3 -> <EOF>
+    */
+   public R visit(PrologFTA n) {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);
@@ -83,7 +210,7 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f3 -> ( Ident() )*
     * f4 -> <FULLSTOP>
     */
-   public R visit(FinalStates n) {
+   public R visit(PrologFinalStates n) {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);
@@ -94,9 +221,9 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    }
 
    /**
-    * f0 -> ( Transition() )*
+    * f0 -> ( Transition() <FULLSTOP> )*
     */
-   public R visit(Delta n) {
+   public R visit(PrologTransitions n) {
       R _ret=null;
       n.f0.accept(this);
       return _ret;
@@ -105,26 +232,11 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
    /**
     * f0 -> LHS()
     * f1 -> RHS()
-    * f2 -> <FULLSTOP>
     */
    public R visit(Transition n) {
       R _ret=null;
       n.f0.accept(this);
       n.f1.accept(this);
-      n.f2.accept(this);
-      return _ret;
-   }
-
-   /**
-    * f0 -> Ident() ( <LBRACE> Ident() ( <COMMA> Ident() )* <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
-    *       | <NUMBER> <ARROW>
-    *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
-    *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )
-    *       | <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW>
-    */
-   public R visit(LHS n) {
-      R _ret=null;
-      n.f0.accept(this);
       return _ret;
    }
 
@@ -132,6 +244,19 @@ public class GJNoArguDepthFirst<R> implements GJNoArguVisitor<R> {
     * f0 -> Ident()
     */
    public R visit(RHS n) {
+      R _ret=null;
+      n.f0.accept(this);
+      return _ret;
+   }
+
+   /**
+    * f0 -> Ident() ( <LBRACE> ( Ident() ( <COMMA> Ident() )* )? <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
+    *       | <NUMBER> <ARROW>
+    *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
+    *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )
+    *       | <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW>
+    */
+   public R visit(LHS n) {
       R _ret=null;
       n.f0.accept(this);
       return _ret;

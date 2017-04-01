@@ -10,21 +10,18 @@ package dfta.parser.syntaxtree;
  * f1 -> <STATES>
  * f2 -> Ident()
  * f3 -> ( Ident() )*
- * f4 -> <FULLSTOP>
  */
 public class FinalStates implements Node {
    public NodeToken f0;
    public NodeToken f1;
    public Ident f2;
    public NodeListOptional f3;
-   public NodeToken f4;
 
-   public FinalStates(NodeToken n0, NodeToken n1, Ident n2, NodeListOptional n3, NodeToken n4) {
+   public FinalStates(NodeToken n0, NodeToken n1, Ident n2, NodeListOptional n3) {
       f0 = n0;
       f1 = n1;
       f2 = n2;
       f3 = n3;
-      f4 = n4;
    }
 
    public FinalStates(Ident n0, NodeListOptional n1) {
@@ -32,7 +29,6 @@ public class FinalStates implements Node {
       f1 = new NodeToken("States");
       f2 = n0;
       f3 = n1;
-      f4 = new NodeToken(".");
    }
 
    public void accept(dfta.parser.visitor.Visitor v) {

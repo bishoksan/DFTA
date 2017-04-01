@@ -7,27 +7,30 @@ public interface FTAParserConstants {
   int FINAL = 5;
   int STATES = 6;
   int TRANSITIONS = 7;
-  int LBRACE = 8;
-  int RBRACE = 9;
-  int LSQBRACE = 10;
-  int RSQBRACE = 11;
-  int VERTBAR = 12;
-  int UNDERSCORE = 13;
-  int COMMA = 14;
-  int FULLSTOP = 15;
-  int ARROW = 16;
-  int QUOTE = 17;
-  int BINOP = 18;
-  int ANYOP = 19;
-  int NUMBER = 20;
-  int DECIMALNUMBER = 21;
-  int IDENTIFIER = 22;
-  int LETTER = 23;
-  int DIGIT = 24;
-  int QIDENT = 25;
-  int NONQUOTE = 26;
-  int SINGLE_LINE_COMMENT = 27;
-  int MULTI_LINE_COMMENT = 28;
+  int AUTOMATON = 8;
+  int OPS = 9;
+  int LBRACE = 10;
+  int RBRACE = 11;
+  int LSQBRACE = 12;
+  int RSQBRACE = 13;
+  int VERTBAR = 14;
+  int UNDERSCORE = 15;
+  int COMMA = 16;
+  int COLON = 17;
+  int FULLSTOP = 18;
+  int ARROW = 19;
+  int QUOTE = 20;
+  int BINOP = 21;
+  int ANYOP = 22;
+  int NUMBER = 23;
+  int DECIMALNUMBER = 24;
+  int IDENTIFIER = 25;
+  int LETTER = 26;
+  int DIGIT = 27;
+  int QIDENT = 28;
+  int NONQUOTE = 29;
+  int SINGLE_LINE_COMMENT = 30;
+  int MULTI_LINE_COMMENT = 31;
 
   int DEFAULT = 0;
 
@@ -40,6 +43,8 @@ public interface FTAParserConstants {
     "\"Final\"",
     "\"States\"",
     "\"Transitions\"",
+    "\"Automaton\"",
+    "\"Ops\"",
     "\"(\"",
     "\")\"",
     "\"[\"",
@@ -47,6 +52,7 @@ public interface FTAParserConstants {
     "\"|\"",
     "\"_\"",
     "\",\"",
+    "\":\"",
     "\".\"",
     "\"->\"",
     "\"\\\'\"",

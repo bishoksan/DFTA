@@ -27,12 +27,81 @@ public interface Visitor {
    //
 
    /**
-    * f0 -> ( FinalStates() )?
-    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
-    * f2 -> Delta()
-    * f3 -> <EOF>
+    * f0 -> ( TimbukFTA() | PrologFTA() )
     */
    public void visit(FTA n);
+
+   /**
+    * f0 -> OpsDecls()
+    * f1 -> Automaton()
+    * f2 -> States()
+    * f3 -> FinalStates()
+    * f4 -> TimbukTransitions()
+    * f5 -> <EOF>
+    */
+   public void visit(TimbukFTA n);
+
+   /**
+    * f0 -> <OPS>
+    * f1 -> LabelList()
+    */
+   public void visit(OpsDecls n);
+
+   /**
+    * f0 -> ( LabelDecl() )*
+    */
+   public void visit(LabelList n);
+
+   /**
+    * f0 -> <IDENTIFIER>
+    * f1 -> <COLON>
+    * f2 -> <NUMBER>
+    */
+   public void visit(LabelDecl n);
+
+   /**
+    * f0 -> <AUTOMATON>
+    * f1 -> <IDENTIFIER>
+    */
+   public void visit(Automaton n);
+
+   /**
+    * f0 -> <STATES>
+    * f1 -> StateList()
+    */
+   public void visit(States n);
+
+   /**
+    * f0 -> ( Ident() )*
+    */
+   public void visit(StateList n);
+
+   /**
+    * f0 -> <FINAL>
+    * f1 -> <STATES>
+    * f2 -> Ident()
+    * f3 -> ( Ident() )*
+    */
+   public void visit(FinalStates n);
+
+   /**
+    * f0 -> <TRANSITIONS>
+    * f1 -> TimbukTransitionList()
+    */
+   public void visit(TimbukTransitions n);
+
+   /**
+    * f0 -> ( Transition() )*
+    */
+   public void visit(TimbukTransitionList n);
+
+   /**
+    * f0 -> ( PrologFinalStates() )?
+    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
+    * f2 -> PrologTransitions()
+    * f3 -> <EOF>
+    */
+   public void visit(PrologFTA n);
 
    /**
     * f0 -> <FINAL>
@@ -41,33 +110,32 @@ public interface Visitor {
     * f3 -> ( Ident() )*
     * f4 -> <FULLSTOP>
     */
-   public void visit(FinalStates n);
+   public void visit(PrologFinalStates n);
 
    /**
-    * f0 -> ( Transition() )*
+    * f0 -> ( Transition() <FULLSTOP> )*
     */
-   public void visit(Delta n);
+   public void visit(PrologTransitions n);
 
    /**
     * f0 -> LHS()
     * f1 -> RHS()
-    * f2 -> <FULLSTOP>
     */
    public void visit(Transition n);
 
    /**
-    * f0 -> Ident() ( <LBRACE> Ident() ( <COMMA> Ident() )* <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
+    * f0 -> Ident()
+    */
+   public void visit(RHS n);
+
+   /**
+    * f0 -> Ident() ( <LBRACE> ( Ident() ( <COMMA> Ident() )* )? <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
     *       | <NUMBER> <ARROW>
     *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
     *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )
     *       | <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW>
     */
    public void visit(LHS n);
-
-   /**
-    * f0 -> Ident()
-    */
-   public void visit(RHS n);
 
    /**
     * f0 -> <IDENTIFIER>

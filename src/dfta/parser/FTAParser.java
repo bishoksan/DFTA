@@ -11,24 +11,241 @@ public class FTAParser implements FTAParserConstants {
    public static LinkedHashSet finalStates = new LinkedHashSet();
 
   static final public FTA FTA() throws ParseException {
+   NodeChoice n0;
+   TimbukFTA n1;
+   PrologFTA n2;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case OPS:
+      n1 = TimbukFTA();
+           n0 = new NodeChoice(n1, 0);
+      break;
+    case 0:
+    case FINAL:
+    case TRANSITIONS:
+    case LBRACE:
+    case LSQBRACE:
+    case ANYOP:
+    case NUMBER:
+    case IDENTIFIER:
+    case QIDENT:
+      n2 = PrologFTA();
+           n0 = new NodeChoice(n2, 1);
+      break;
+    default:
+      jj_la1[0] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+     {if (true) return new FTA(n0);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public TimbukFTA TimbukFTA() throws ParseException {
+   OpsDecls n0;
+   Automaton n1;
+   States n2;
+   FinalStates n3;
+   TimbukTransitions n4;
+   NodeToken n5;
+   Token n6;
+    n0 = OpsDecls();
+    n1 = Automaton();
+    n2 = States();
+    n3 = FinalStates();
+    n4 = TimbukTransitions();
+    n6 = jj_consume_token(0);
+      n6.beginColumn++; n6.endColumn++;
+      n5 = JTBToolkit.makeNodeToken(n6);
+     {if (true) return new TimbukFTA(n0,n1,n2,n3,n4,n5);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public OpsDecls OpsDecls() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   LabelList n2;
+    n1 = jj_consume_token(OPS);
+              n0 = JTBToolkit.makeNodeToken(n1);
+    n2 = LabelList();
+     {if (true) return new OpsDecls(n0,n2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public LabelList LabelList() throws ParseException {
+   NodeListOptional n0 = new NodeListOptional();
+   LabelDecl n1;
+    label_1:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IDENTIFIER:
+        ;
+        break;
+      default:
+        jj_la1[1] = jj_gen;
+        break label_1;
+      }
+      n1 = LabelDecl();
+        n0.addNode(n1);
+    }
+     n0.nodes.trimToSize();
+     {if (true) return new LabelList(n0);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public LabelDecl LabelDecl() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   NodeToken n4;
+   Token n5;
+    n1 = jj_consume_token(IDENTIFIER);
+                     n0 = JTBToolkit.makeNodeToken(n1);
+    n3 = jj_consume_token(COLON);
+                n2 = JTBToolkit.makeNodeToken(n3);
+    n5 = jj_consume_token(NUMBER);
+                 n4 = JTBToolkit.makeNodeToken(n5);
+     {if (true) return new LabelDecl(n0,n2,n4);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public Automaton Automaton() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+    n1 = jj_consume_token(AUTOMATON);
+                    n0 = JTBToolkit.makeNodeToken(n1);
+    n3 = jj_consume_token(IDENTIFIER);
+                     n2 = JTBToolkit.makeNodeToken(n3);
+     {if (true) return new Automaton(n0,n2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public States States() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   StateList n2;
+    n1 = jj_consume_token(STATES);
+                 n0 = JTBToolkit.makeNodeToken(n1);
+    n2 = StateList();
+     {if (true) return new States(n0,n2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public StateList StateList() throws ParseException {
+   NodeListOptional n0 = new NodeListOptional();
+   Ident n1;
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IDENTIFIER:
+      case QIDENT:
+        ;
+        break;
+      default:
+        jj_la1[2] = jj_gen;
+        break label_2;
+      }
+      n1 = Ident();
+        n0.addNode(n1);
+    }
+     n0.nodes.trimToSize();
+     {if (true) return new StateList(n0);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public FinalStates FinalStates() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   Ident n4;
+   NodeListOptional n5 = new NodeListOptional();
+   Ident n6;
+    n1 = jj_consume_token(FINAL);
+                n0 = JTBToolkit.makeNodeToken(n1);
+    n3 = jj_consume_token(STATES);
+                 n2 = JTBToolkit.makeNodeToken(n3);
+    n4 = Ident();
+      finalStates.add(((NodeToken)n4.f0.choice).tokenImage);
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IDENTIFIER:
+      case QIDENT:
+        ;
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        break label_3;
+      }
+      n6 = Ident();
+         finalStates.add(((NodeToken)n6.f0.choice).tokenImage);
+        n5.addNode(n6);
+    }
+     n5.nodes.trimToSize();
+     {if (true) return new FinalStates(n0,n2,n4,n5);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public TimbukTransitions TimbukTransitions() throws ParseException {
+   NodeToken n0;
+   Token n1;
+   TimbukTransitionList n2;
+    n1 = jj_consume_token(TRANSITIONS);
+                      n0 = JTBToolkit.makeNodeToken(n1);
+    n2 = TimbukTransitionList();
+     {if (true) return new TimbukTransitions(n0,n2);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public TimbukTransitionList TimbukTransitionList() throws ParseException {
+   NodeListOptional n0 = new NodeListOptional();
+   Transition n1;
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LBRACE:
+      case LSQBRACE:
+      case ANYOP:
+      case NUMBER:
+      case IDENTIFIER:
+      case QIDENT:
+        ;
+        break;
+      default:
+        jj_la1[4] = jj_gen;
+        break label_4;
+      }
+      n1 = Transition();
+         transitions.add(n1);
+        n0.addNode(n1);
+    }
+     n0.nodes.trimToSize();
+     {if (true) return new TimbukTransitionList(n0);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public PrologFTA PrologFTA() throws ParseException {
    NodeOptional n0 = new NodeOptional();
-   FinalStates n1;
+   PrologFinalStates n1;
    NodeOptional n2 = new NodeOptional();
    NodeSequence n3;
    NodeToken n4;
    Token n5;
    NodeToken n6;
    Token n7;
-   Delta n8;
+   PrologTransitions n8;
    NodeToken n9;
    Token n10;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case FINAL:
-      n1 = FinalStates();
+      n1 = PrologFinalStates();
         n0.addNode(n1);
       break;
     default:
-      jj_la1[0] = jj_gen;
+      jj_la1[5] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -43,18 +260,18 @@ public class FTAParser implements FTAParserConstants {
         n2.addNode(n3);
       break;
     default:
-      jj_la1[1] = jj_gen;
+      jj_la1[6] = jj_gen;
       ;
     }
-    n8 = Delta();
+    n8 = PrologTransitions();
     n10 = jj_consume_token(0);
       n10.beginColumn++; n10.endColumn++;
       n9 = JTBToolkit.makeNodeToken(n10);
-     {if (true) return new FTA(n0,n2,n8,n9);}
+     {if (true) return new PrologFTA(n0,n2,n8,n9);}
     throw new Error("Missing return statement in function");
   }
 
-  static final public FinalStates FinalStates() throws ParseException {
+  static final public PrologFinalStates PrologFinalStates() throws ParseException {
    NodeToken n0;
    Token n1;
    NodeToken n2;
@@ -70,7 +287,7 @@ public class FTAParser implements FTAParserConstants {
                  n2 = JTBToolkit.makeNodeToken(n3);
     n4 = Ident();
       finalStates.add(((NodeToken)n4.f0.choice).tokenImage);
-    label_1:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IDENTIFIER:
@@ -78,8 +295,8 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[2] = jj_gen;
-        break label_1;
+        jj_la1[7] = jj_gen;
+        break label_5;
       }
       n6 = Ident();
          finalStates.add(((NodeToken)n6.f0.choice).tokenImage);
@@ -88,14 +305,17 @@ public class FTAParser implements FTAParserConstants {
      n5.nodes.trimToSize();
     n8 = jj_consume_token(FULLSTOP);
                    n7 = JTBToolkit.makeNodeToken(n8);
-     {if (true) return new FinalStates(n0,n2,n4,n5,n7);}
+     {if (true) return new PrologFinalStates(n0,n2,n4,n5,n7);}
     throw new Error("Missing return statement in function");
   }
 
-  static final public Delta Delta() throws ParseException {
+  static final public PrologTransitions PrologTransitions() throws ParseException {
    NodeListOptional n0 = new NodeListOptional();
-   Transition n1;
-    label_2:
+   NodeSequence n1;
+   Transition n2;
+   NodeToken n3;
+   Token n4;
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LBRACE:
@@ -107,28 +327,36 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
-        break label_2;
+        jj_la1[8] = jj_gen;
+        break label_6;
       }
-      n1 = Transition();
-         transitions.add(n1);
+        n1 = new NodeSequence(3);
+      n2 = Transition();
+        n1.addNode(n2);
+      n4 = jj_consume_token(FULLSTOP);
+                      n3 = JTBToolkit.makeNodeToken(n4);
+        n1.addNode(n3);
+         transitions.add(n2);
         n0.addNode(n1);
     }
      n0.nodes.trimToSize();
-     {if (true) return new Delta(n0);}
+     {if (true) return new PrologTransitions(n0);}
     throw new Error("Missing return statement in function");
   }
 
   static final public Transition Transition() throws ParseException {
    LHS n0;
    RHS n1;
-   NodeToken n2;
-   Token n3;
     n0 = LHS();
     n1 = RHS();
-    n3 = jj_consume_token(FULLSTOP);
-                   n2 = JTBToolkit.makeNodeToken(n3);
-     {if (true) return new Transition(n0,n1,n2);}
+     {if (true) return new Transition(n0,n1);}
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public RHS RHS() throws ParseException {
+   Ident n0;
+    n0 = Ident();
+     {if (true) return new RHS(n0);}
     throw new Error("Missing return statement in function");
   }
 
@@ -140,82 +368,84 @@ public class FTAParser implements FTAParserConstants {
    NodeSequence n4;
    NodeToken n5;
    Token n6;
-   Ident n7;
-   NodeListOptional n8 = new NodeListOptional();
-   NodeSequence n9;
-   NodeToken n10;
-   Token n11;
-   Ident n12;
-   NodeToken n13;
-   Token n14;
+   NodeOptional n7 = new NodeOptional();
+   NodeSequence n8;
+   Ident n9;
+   NodeListOptional n10;
+   NodeSequence n11;
+   NodeToken n12;
+   Token n13;
+   Ident n14;
    NodeToken n15;
    Token n16;
    NodeToken n17;
    Token n18;
-   NodeSequence n19;
-   NodeToken n20;
-   Token n21;
-   Ident n22;
-   NodeToken n23;
-   Token n24;
-   NodeSequence n25;
-   NodeToken n26;
-   Token n27;
-   Ident n28;
-   NodeToken n29;
-   Token n30;
-   NodeSequence n31;
-   NodeToken n32;
-   Token n33;
-   Ident n34;
-   NodeToken n35;
-   Token n36;
-   NodeSequence n37;
-   NodeToken n38;
-   Token n39;
+   NodeToken n19;
+   Token n20;
+   NodeSequence n21;
+   NodeToken n22;
+   Token n23;
+   Ident n24;
+   NodeToken n25;
+   Token n26;
+   NodeSequence n27;
+   NodeToken n28;
+   Token n29;
+   Ident n30;
+   NodeToken n31;
+   Token n32;
+   NodeSequence n33;
+   NodeToken n34;
+   Token n35;
+   Ident n36;
+   NodeToken n37;
+   Token n38;
+   NodeSequence n39;
    NodeToken n40;
    Token n41;
-   NodeSequence n42;
-   NodeToken n43;
-   Token n44;
-   NodeChoice n45;
-   NodeToken n46;
-   Token n47;
-   Ident n48;
-   NodeToken n49;
-   Token n50;
-   NodeSequence n51;
-   NodeToken n52;
-   Token n53;
-   NodeChoice n54;
-   NodeSequence n55;
-   Ident n56;
-   NodeToken n57;
-   Token n58;
-   Ident n59;
-   NodeToken n60;
-   Token n61;
+   NodeToken n42;
+   Token n43;
+   NodeSequence n44;
+   NodeToken n45;
+   Token n46;
+   NodeChoice n47;
+   NodeToken n48;
+   Token n49;
+   Ident n50;
+   NodeToken n51;
+   Token n52;
+   NodeSequence n53;
+   NodeToken n54;
+   Token n55;
+   NodeChoice n56;
+   NodeSequence n57;
+   Ident n58;
+   NodeToken n59;
+   Token n60;
+   Ident n61;
    NodeToken n62;
    Token n63;
-   NodeSequence n64;
-   NodeToken n65;
-   Token n66;
+   NodeToken n64;
+   Token n65;
+   NodeSequence n66;
    NodeToken n67;
    Token n68;
-   NodeSequence n69;
-   NodeToken n70;
-   Token n71;
-   Ident n72;
-   NodeChoice n73;
-   NodeToken n74;
-   Token n75;
+   NodeToken n69;
+   Token n70;
+   NodeSequence n71;
+   NodeToken n72;
+   Token n73;
+   Ident n74;
+   NodeChoice n75;
    NodeToken n76;
    Token n77;
-   Ident n78;
-   NodeToken n79;
-   Token n80;
+   NodeToken n78;
+   Token n79;
+   Ident n80;
    NodeToken n81;
    Token n82;
+   NodeToken n83;
+   Token n84;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IDENTIFIER:
     case QIDENT:
@@ -224,83 +454,95 @@ public class FTAParser implements FTAParserConstants {
         n1.addNode(n2);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LBRACE:
-              n4 = new NodeSequence(5);
+              n4 = new NodeSequence(4);
         n6 = jj_consume_token(LBRACE);
                           n5 = JTBToolkit.makeNodeToken(n6);
               n4.addNode(n5);
-        n7 = Ident();
-              n4.addNode(n7);
-        label_3:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case COMMA:
-            ;
-            break;
-          default:
-            jj_la1[4] = jj_gen;
-            break label_3;
-          }
-                 n9 = new NodeSequence(2);
-          n11 = jj_consume_token(COMMA);
-                             n10 = JTBToolkit.makeNodeToken(n11);
-                 n9.addNode(n10);
-          n12 = Ident();
-                 n9.addNode(n12);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case IDENTIFIER:
+        case QIDENT:
+                 n10 = new NodeListOptional();
+                 n8 = new NodeSequence(2);
+          n9 = Ident();
                  n8.addNode(n9);
+          label_7:
+          while (true) {
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case COMMA:
+              ;
+              break;
+            default:
+              jj_la1[9] = jj_gen;
+              break label_7;
+            }
+                    n11 = new NodeSequence(2);
+            n13 = jj_consume_token(COMMA);
+                                n12 = JTBToolkit.makeNodeToken(n13);
+                    n11.addNode(n12);
+            n14 = Ident();
+                    n11.addNode(n14);
+                    n10.addNode(n11);
+          }
+                 n10.nodes.trimToSize();
+                 n8.addNode(n10);
+                 n7.addNode(n8);
+          break;
+        default:
+          jj_la1[10] = jj_gen;
+          ;
         }
-              n8.nodes.trimToSize();
-              n4.addNode(n8);
-        n14 = jj_consume_token(RBRACE);
-                           n13 = JTBToolkit.makeNodeToken(n14);
-              n4.addNode(n13);
-        n16 = jj_consume_token(ARROW);
-                          n15 = JTBToolkit.makeNodeToken(n16);
+              n4.addNode(n7);
+        n16 = jj_consume_token(RBRACE);
+                           n15 = JTBToolkit.makeNodeToken(n16);
               n4.addNode(n15);
+        n18 = jj_consume_token(ARROW);
+                          n17 = JTBToolkit.makeNodeToken(n18);
+              n4.addNode(n17);
               n3 = new NodeChoice(n4, 0);
         break;
       case ARROW:
-        n18 = jj_consume_token(ARROW);
-                          n17 = JTBToolkit.makeNodeToken(n18);
-              n3 = new NodeChoice(n17, 1);
+        n20 = jj_consume_token(ARROW);
+                          n19 = JTBToolkit.makeNodeToken(n20);
+              n3 = new NodeChoice(n19, 1);
         break;
       case BINOP:
-              n19 = new NodeSequence(3);
-        n21 = jj_consume_token(BINOP);
-                          n20 = JTBToolkit.makeNodeToken(n21);
-              n19.addNode(n20);
-        n22 = Ident();
-              n19.addNode(n22);
-        n24 = jj_consume_token(ARROW);
-                          n23 = JTBToolkit.makeNodeToken(n24);
-              n19.addNode(n23);
-              n3 = new NodeChoice(n19, 2);
+              n21 = new NodeSequence(3);
+        n23 = jj_consume_token(BINOP);
+                          n22 = JTBToolkit.makeNodeToken(n23);
+              n21.addNode(n22);
+        n24 = Ident();
+              n21.addNode(n24);
+        n26 = jj_consume_token(ARROW);
+                          n25 = JTBToolkit.makeNodeToken(n26);
+              n21.addNode(n25);
+              n3 = new NodeChoice(n21, 2);
         break;
       case ANYOP:
-              n25 = new NodeSequence(3);
-        n27 = jj_consume_token(ANYOP);
-                          n26 = JTBToolkit.makeNodeToken(n27);
-              n25.addNode(n26);
-        n28 = Ident();
-              n25.addNode(n28);
-        n30 = jj_consume_token(ARROW);
-                          n29 = JTBToolkit.makeNodeToken(n30);
-              n25.addNode(n29);
-              n3 = new NodeChoice(n25, 3);
+              n27 = new NodeSequence(3);
+        n29 = jj_consume_token(ANYOP);
+                          n28 = JTBToolkit.makeNodeToken(n29);
+              n27.addNode(n28);
+        n30 = Ident();
+              n27.addNode(n30);
+        n32 = jj_consume_token(ARROW);
+                          n31 = JTBToolkit.makeNodeToken(n32);
+              n27.addNode(n31);
+              n3 = new NodeChoice(n27, 3);
         break;
       case COMMA:
-              n31 = new NodeSequence(3);
-        n33 = jj_consume_token(COMMA);
-                          n32 = JTBToolkit.makeNodeToken(n33);
-              n31.addNode(n32);
-        n34 = Ident();
-              n31.addNode(n34);
-        n36 = jj_consume_token(ARROW);
-                          n35 = JTBToolkit.makeNodeToken(n36);
-              n31.addNode(n35);
-              n3 = new NodeChoice(n31, 4);
+              n33 = new NodeSequence(3);
+        n35 = jj_consume_token(COMMA);
+                          n34 = JTBToolkit.makeNodeToken(n35);
+              n33.addNode(n34);
+        n36 = Ident();
+              n33.addNode(n36);
+        n38 = jj_consume_token(ARROW);
+                          n37 = JTBToolkit.makeNodeToken(n38);
+              n33.addNode(n37);
+              n3 = new NodeChoice(n33, 4);
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[11] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -308,131 +550,124 @@ public class FTAParser implements FTAParserConstants {
         n0 = new NodeChoice(n1, 0);
       break;
     case NUMBER:
-        n37 = new NodeSequence(2);
-      n39 = jj_consume_token(NUMBER);
-                     n38 = JTBToolkit.makeNodeToken(n39);
-        n37.addNode(n38);
-      n41 = jj_consume_token(ARROW);
-                    n40 = JTBToolkit.makeNodeToken(n41);
-        n37.addNode(n40);
-        n0 = new NodeChoice(n37, 1);
+        n39 = new NodeSequence(2);
+      n41 = jj_consume_token(NUMBER);
+                     n40 = JTBToolkit.makeNodeToken(n41);
+        n39.addNode(n40);
+      n43 = jj_consume_token(ARROW);
+                    n42 = JTBToolkit.makeNodeToken(n43);
+        n39.addNode(n42);
+        n0 = new NodeChoice(n39, 1);
       break;
     case ANYOP:
-        n42 = new NodeSequence(3);
-      n44 = jj_consume_token(ANYOP);
-                    n43 = JTBToolkit.makeNodeToken(n44);
-        n42.addNode(n43);
+        n44 = new NodeSequence(3);
+      n46 = jj_consume_token(ANYOP);
+                    n45 = JTBToolkit.makeNodeToken(n46);
+        n44.addNode(n45);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NUMBER:
-        n47 = jj_consume_token(NUMBER);
-                           n46 = JTBToolkit.makeNodeToken(n47);
-              n45 = new NodeChoice(n46, 0);
+        n49 = jj_consume_token(NUMBER);
+                           n48 = JTBToolkit.makeNodeToken(n49);
+              n47 = new NodeChoice(n48, 0);
         break;
       case IDENTIFIER:
       case QIDENT:
-        n48 = Ident();
-              n45 = new NodeChoice(n48, 1);
+        n50 = Ident();
+              n47 = new NodeChoice(n50, 1);
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-        n42.addNode(n45);
-      n50 = jj_consume_token(ARROW);
-                    n49 = JTBToolkit.makeNodeToken(n50);
-        n42.addNode(n49);
-        n0 = new NodeChoice(n42, 2);
+        n44.addNode(n47);
+      n52 = jj_consume_token(ARROW);
+                    n51 = JTBToolkit.makeNodeToken(n52);
+        n44.addNode(n51);
+        n0 = new NodeChoice(n44, 2);
       break;
     case LSQBRACE:
-        n51 = new NodeSequence(2);
-      n53 = jj_consume_token(LSQBRACE);
-                       n52 = JTBToolkit.makeNodeToken(n53);
-        n51.addNode(n52);
+        n53 = new NodeSequence(2);
+      n55 = jj_consume_token(LSQBRACE);
+                       n54 = JTBToolkit.makeNodeToken(n55);
+        n53.addNode(n54);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IDENTIFIER:
       case QIDENT:
-              n55 = new NodeSequence(5);
-        n56 = Ident();
-              n55.addNode(n56);
-        n58 = jj_consume_token(VERTBAR);
-                            n57 = JTBToolkit.makeNodeToken(n58);
-              n55.addNode(n57);
-        n59 = Ident();
-              n55.addNode(n59);
-        n61 = jj_consume_token(RSQBRACE);
-                             n60 = JTBToolkit.makeNodeToken(n61);
-              n55.addNode(n60);
-        n63 = jj_consume_token(ARROW);
-                          n62 = JTBToolkit.makeNodeToken(n63);
-              n55.addNode(n62);
-              n54 = new NodeChoice(n55, 0);
+              n57 = new NodeSequence(5);
+        n58 = Ident();
+              n57.addNode(n58);
+        n60 = jj_consume_token(VERTBAR);
+                            n59 = JTBToolkit.makeNodeToken(n60);
+              n57.addNode(n59);
+        n61 = Ident();
+              n57.addNode(n61);
+        n63 = jj_consume_token(RSQBRACE);
+                             n62 = JTBToolkit.makeNodeToken(n63);
+              n57.addNode(n62);
+        n65 = jj_consume_token(ARROW);
+                          n64 = JTBToolkit.makeNodeToken(n65);
+              n57.addNode(n64);
+              n56 = new NodeChoice(n57, 0);
         break;
       case RSQBRACE:
-              n64 = new NodeSequence(2);
-        n66 = jj_consume_token(RSQBRACE);
-                             n65 = JTBToolkit.makeNodeToken(n66);
-              n64.addNode(n65);
-        n68 = jj_consume_token(ARROW);
-                          n67 = JTBToolkit.makeNodeToken(n68);
-              n64.addNode(n67);
-              n54 = new NodeChoice(n64, 1);
+              n66 = new NodeSequence(2);
+        n68 = jj_consume_token(RSQBRACE);
+                             n67 = JTBToolkit.makeNodeToken(n68);
+              n66.addNode(n67);
+        n70 = jj_consume_token(ARROW);
+                          n69 = JTBToolkit.makeNodeToken(n70);
+              n66.addNode(n69);
+              n56 = new NodeChoice(n66, 1);
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[13] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-        n51.addNode(n54);
-        n0 = new NodeChoice(n51, 3);
+        n53.addNode(n56);
+        n0 = new NodeChoice(n53, 3);
       break;
     case LBRACE:
-        n69 = new NodeSequence(6);
-      n71 = jj_consume_token(LBRACE);
-                     n70 = JTBToolkit.makeNodeToken(n71);
-        n69.addNode(n70);
-      n72 = Ident();
-        n69.addNode(n72);
+        n71 = new NodeSequence(6);
+      n73 = jj_consume_token(LBRACE);
+                     n72 = JTBToolkit.makeNodeToken(n73);
+        n71.addNode(n72);
+      n74 = Ident();
+        n71.addNode(n74);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
-        n75 = jj_consume_token(COMMA);
-                          n74 = JTBToolkit.makeNodeToken(n75);
-              n73 = new NodeChoice(n74, 0);
+        n77 = jj_consume_token(COMMA);
+                          n76 = JTBToolkit.makeNodeToken(n77);
+              n75 = new NodeChoice(n76, 0);
         break;
       case BINOP:
-        n77 = jj_consume_token(BINOP);
-                          n76 = JTBToolkit.makeNodeToken(n77);
-              n73 = new NodeChoice(n76, 1);
+        n79 = jj_consume_token(BINOP);
+                          n78 = JTBToolkit.makeNodeToken(n79);
+              n75 = new NodeChoice(n78, 1);
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[14] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-        n69.addNode(n73);
-      n78 = Ident();
-        n69.addNode(n78);
-      n80 = jj_consume_token(RBRACE);
-                     n79 = JTBToolkit.makeNodeToken(n80);
-        n69.addNode(n79);
-      n82 = jj_consume_token(ARROW);
-                    n81 = JTBToolkit.makeNodeToken(n82);
-        n69.addNode(n81);
-        n0 = new NodeChoice(n69, 4);
+        n71.addNode(n75);
+      n80 = Ident();
+        n71.addNode(n80);
+      n82 = jj_consume_token(RBRACE);
+                     n81 = JTBToolkit.makeNodeToken(n82);
+        n71.addNode(n81);
+      n84 = jj_consume_token(ARROW);
+                    n83 = JTBToolkit.makeNodeToken(n84);
+        n71.addNode(n83);
+        n0 = new NodeChoice(n71, 4);
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
      {if (true) return new LHS(n0);}
-    throw new Error("Missing return statement in function");
-  }
-
-  static final public RHS RHS() throws ParseException {
-   Ident n0;
-    n0 = Ident();
-     {if (true) return new RHS(n0);}
     throw new Error("Missing return statement in function");
   }
 
@@ -454,7 +689,7 @@ public class FTAParser implements FTAParserConstants {
         n0 = new NodeChoice(n3, 1);
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[16] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -468,13 +703,13 @@ public class FTAParser implements FTAParserConstants {
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[11];
+  static final private int[] jj_la1 = new int[17];
   static private int[] jj_la1_0;
   static {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x20,0x80,0x2400000,0x2580500,0x4000,0xd4100,0x2500000,0x2400800,0x44000,0x2580500,0x2400000,};
+      jj_la1_0 = new int[] {0x12c016a1,0x2000000,0x12000000,0x12000000,0x12c01400,0x20,0x80,0x12000000,0x12c01400,0x10000,0x12000000,0x690400,0x12800000,0x12002000,0x210000,0x12c01400,0x12000000,};
    }
 
   public FTAParser(java.io.InputStream stream) {
@@ -493,7 +728,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.InputStream stream) {
@@ -505,7 +740,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   public FTAParser(java.io.Reader stream) {
@@ -521,7 +756,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.Reader stream) {
@@ -530,7 +765,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   public FTAParser(FTAParserTokenManager tm) {
@@ -545,7 +780,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(FTAParserTokenManager tm) {
@@ -553,7 +788,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   static final private Token jj_consume_token(int kind) throws ParseException {
@@ -600,15 +835,15 @@ public class FTAParser implements FTAParserConstants {
 
   static public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[29];
-    for (int i = 0; i < 29; i++) {
+    boolean[] la1tokens = new boolean[32];
+    for (int i = 0; i < 32; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 17; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -617,7 +852,7 @@ public class FTAParser implements FTAParserConstants {
         }
       }
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 32; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

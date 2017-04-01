@@ -6,7 +6,7 @@ package dfta.parser.syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> Ident() ( <LBRACE> Ident() ( <COMMA> Ident() )* <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
+ * f0 -> Ident() ( <LBRACE> ( Ident() ( <COMMA> Ident() )* )? <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
  *       | <NUMBER> <ARROW>
  *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
  *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )

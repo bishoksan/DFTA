@@ -52,12 +52,117 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    //
 
    /**
-    * f0 -> ( FinalStates() )?
-    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
-    * f2 -> Delta()
-    * f3 -> <EOF>
+    * f0 -> ( TimbukFTA() | PrologFTA() )
     */
    public void visit(FTA n, A argu) {
+      n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> OpsDecls()
+    * f1 -> Automaton()
+    * f2 -> States()
+    * f3 -> FinalStates()
+    * f4 -> TimbukTransitions()
+    * f5 -> <EOF>
+    */
+   public void visit(TimbukFTA n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+      n.f4.accept(this, argu);
+      n.f5.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <OPS>
+    * f1 -> LabelList()
+    */
+   public void visit(OpsDecls n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+   }
+
+   /**
+    * f0 -> ( LabelDecl() )*
+    */
+   public void visit(LabelList n, A argu) {
+      n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <IDENTIFIER>
+    * f1 -> <COLON>
+    * f2 -> <NUMBER>
+    */
+   public void visit(LabelDecl n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <AUTOMATON>
+    * f1 -> <IDENTIFIER>
+    */
+   public void visit(Automaton n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <STATES>
+    * f1 -> StateList()
+    */
+   public void visit(States n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+   }
+
+   /**
+    * f0 -> ( Ident() )*
+    */
+   public void visit(StateList n, A argu) {
+      n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <FINAL>
+    * f1 -> <STATES>
+    * f2 -> Ident()
+    * f3 -> ( Ident() )*
+    */
+   public void visit(FinalStates n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+      n.f2.accept(this, argu);
+      n.f3.accept(this, argu);
+   }
+
+   /**
+    * f0 -> <TRANSITIONS>
+    * f1 -> TimbukTransitionList()
+    */
+   public void visit(TimbukTransitions n, A argu) {
+      n.f0.accept(this, argu);
+      n.f1.accept(this, argu);
+   }
+
+   /**
+    * f0 -> ( Transition() )*
+    */
+   public void visit(TimbukTransitionList n, A argu) {
+      n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> ( PrologFinalStates() )?
+    * f1 -> ( <TRANSITIONS> <FULLSTOP> )?
+    * f2 -> PrologTransitions()
+    * f3 -> <EOF>
+    */
+   public void visit(PrologFTA n, A argu) {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
@@ -71,7 +176,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
     * f3 -> ( Ident() )*
     * f4 -> <FULLSTOP>
     */
-   public void visit(FinalStates n, A argu) {
+   public void visit(PrologFinalStates n, A argu) {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
       n.f2.accept(this, argu);
@@ -80,38 +185,36 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
-    * f0 -> ( Transition() )*
+    * f0 -> ( Transition() <FULLSTOP> )*
     */
-   public void visit(Delta n, A argu) {
+   public void visit(PrologTransitions n, A argu) {
       n.f0.accept(this, argu);
    }
 
    /**
     * f0 -> LHS()
     * f1 -> RHS()
-    * f2 -> <FULLSTOP>
     */
    public void visit(Transition n, A argu) {
       n.f0.accept(this, argu);
       n.f1.accept(this, argu);
-      n.f2.accept(this, argu);
-   }
-
-   /**
-    * f0 -> Ident() ( <LBRACE> Ident() ( <COMMA> Ident() )* <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
-    *       | <NUMBER> <ARROW>
-    *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
-    *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )
-    *       | <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW>
-    */
-   public void visit(LHS n, A argu) {
-      n.f0.accept(this, argu);
    }
 
    /**
     * f0 -> Ident()
     */
    public void visit(RHS n, A argu) {
+      n.f0.accept(this, argu);
+   }
+
+   /**
+    * f0 -> Ident() ( <LBRACE> ( Ident() ( <COMMA> Ident() )* )? <RBRACE> <ARROW> | <ARROW> | <BINOP> Ident() <ARROW> | <ANYOP> Ident() <ARROW> | <COMMA> Ident() <ARROW> )
+    *       | <NUMBER> <ARROW>
+    *       | <ANYOP> ( <NUMBER> | Ident() ) <ARROW>
+    *       | <LSQBRACE> ( Ident() <VERTBAR> Ident() <RSQBRACE> <ARROW> | <RSQBRACE> <ARROW> )
+    *       | <LBRACE> Ident() ( <COMMA> | <BINOP> ) Ident() <RBRACE> <ARROW>
+    */
+   public void visit(LHS n, A argu) {
       n.f0.accept(this, argu);
    }
 

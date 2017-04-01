@@ -8,23 +8,14 @@ package dfta.parser.syntaxtree;
  * Grammar production:
  * f0 -> LHS()
  * f1 -> RHS()
- * f2 -> <FULLSTOP>
  */
 public class Transition implements Node {
    public LHS f0;
    public RHS f1;
-   public NodeToken f2;
-
-   public Transition(LHS n0, RHS n1, NodeToken n2) {
-      f0 = n0;
-      f1 = n1;
-      f2 = n2;
-   }
 
    public Transition(LHS n0, RHS n1) {
       f0 = n0;
       f1 = n1;
-      f2 = new NodeToken(".");
    }
 
    public void accept(dfta.parser.visitor.Visitor v) {

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.io.PrintStream;
+import javax.swing.JTextArea;
 
 public class DeterminiserTextBook implements Determiniser {
 
@@ -234,6 +235,14 @@ public class DeterminiserTextBook implements Determiniser {
       }
       System.out.print(deltad.size() + ", ");
    }
+   
+   public void showStatsApp(JTextArea ja) {
+
+        ja.append("Number of input FTA states = " + idx.qs.size() + "\n");
+        ja.append("Number of input FTA transitions = " + idx.delta.size() + "\n");
+        ja.append("Number of DFTA states = " + qd.size() + "\n");
+        ja.append("Number of DFTA transitions = " + deltad.size() + "\n");
+    }
 
    public HashSet<HashSet<String>> getQd() {
       return qd;

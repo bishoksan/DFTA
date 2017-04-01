@@ -3,7 +3,11 @@ package dfta;
 import dfta.parser.*;
 import java.io.PrintStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.Iterator;
 
 public class Determinise {
@@ -193,5 +197,28 @@ public class Determinise {
       System.out.println("September 2014, Roskilde University Computer Science Research Report #145");
       System.out.println("Contact.  jpg@ruc.dk");
    }
+   
+    public static void copyFile(File sourceFile, File destFile) throws IOException {
+    if(!destFile.exists()) {
+        destFile.createNewFile();
+    }
+
+    FileChannel source = null;
+    FileChannel destination = null;
+
+    try {
+        source = new FileInputStream(sourceFile).getChannel();
+        destination = new FileOutputStream(destFile).getChannel();
+        destination.transferFrom(source, 0, source.size());
+    }
+    finally {
+        if(source != null) {
+            source.close();
+        }
+        if(destination != null) {
+            destination.close();
+        }
+    }
+}
 
 }
