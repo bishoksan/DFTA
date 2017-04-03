@@ -97,12 +97,12 @@ public class Determinise {
 
             if (textbook) {
                det = new DeterminiserTextBook(FTAParser.transitions, FTAParser.finalStates, any, verbose);
-            } else if (bool) {
-               det = new DeterminiserDatalog(stripName(inputFile), FTAParser.transitions, FTAParser.finalStates, any);
-            } else if (sat) {
-               det = new DeterminiserSAT("", FTAParser.transitions, FTAParser.finalStates, any, dontCare, verbose);
-            } else if (optsat) {
-               det = new DeterminiserOptSAT("", FTAParser.transitions, FTAParser.finalStates, any, dontCare, verbose);
+            //} else if (bool) {
+            //   det = new DeterminiserDatalog(stripName(inputFile), FTAParser.transitions, FTAParser.finalStates, any);
+            //} else if (sat) {
+            //   det = new DeterminiserSAT("", FTAParser.transitions, FTAParser.finalStates, any, dontCare, verbose);
+            //} else if (optsat) {
+            //   det = new DeterminiserOptSAT("", FTAParser.transitions, FTAParser.finalStates, any, dontCare, verbose);
             } else {
                det = new DeterminiserOpt("", FTAParser.transitions, FTAParser.finalStates, any, dontCare, verbose);
             }
