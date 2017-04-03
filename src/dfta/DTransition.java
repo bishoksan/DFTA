@@ -1,21 +1,21 @@
 package dfta;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.ArrayList;
 
 public class DTransition {
 
    FuncSymb f;
-   HashSet<String> q0;
-   ArrayList<HashSet<String>> lhs;
+   LinkedHashSet<String> q0;
+   ArrayList<LinkedHashSet<String>> lhs;
 
-   public DTransition(FuncSymb f, HashSet<String> q0, ArrayList<HashSet<String>> lhs) {
+   public DTransition(FuncSymb f, LinkedHashSet<String> q0, ArrayList<LinkedHashSet<String>> lhs) {
       this.f = f;
       this.q0 = q0;
       this.lhs = lhs;
    }
 
-   public DTransition(FuncSymb f, HashSet<String> q0) {
+   public DTransition(FuncSymb f, LinkedHashSet<String> q0) {
       this.f = f;
       this.q0 = q0;
       this.lhs = new ArrayList<>();

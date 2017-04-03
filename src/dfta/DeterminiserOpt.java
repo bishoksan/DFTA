@@ -1,8 +1,8 @@
 package dfta;
 
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.io.PrintStream;
@@ -13,30 +13,30 @@ public class DeterminiserOpt implements Determiniser {
    Indices idx;
    String ftaId;
 
-   HashSet<HashSet<String>> qd = new HashSet<>();
+   LinkedHashSet<LinkedHashSet<String>> qd = new LinkedHashSet<>();
    ArrayList<PTransition> deltad = new ArrayList<>();
 
-   HashMap<FuncSymb, ArrayList<HashMap<BitSet, HashSet<HashSet<String>>>>> t_inverse_table;
-   HashMap<FuncSymb, ArrayList<HashSet<BitSet>>> psi
-           = new HashMap<>();
-   HashMap<FuncSymb, ArrayList<BitSet>> psi_glb;
+   LinkedHashMap<FuncSymb, ArrayList<LinkedHashMap<BitSet, LinkedHashSet<LinkedHashSet<String>>>>> t_inverse_table;
+   LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<BitSet>>> psi
+           = new LinkedHashMap<>();
+   LinkedHashMap<FuncSymb, ArrayList<BitSet>> psi_glb;
 
    boolean dontCare = true;
    boolean any = false;
    boolean includesCheck = false;
    boolean verbose;
 
-   HashSet<String> q1;  //  final states of FTA 1
-   HashSet<String> q2;  //  final states of FTA 2 
+   LinkedHashSet<String> q1;  //  final states of FTA 1
+   LinkedHashSet<String> q2;  //  final states of FTA 2 
 
-   HashMap<FuncSymb, HashMap<Integer, ArrayList<ArrayList<Integer>>>> exprMap = new HashMap<>();
-   HashMap<FuncSymb, HashSet<Integer>> constMap = new HashMap<>();
-   HashMap<String, Integer> qIdxInv = new HashMap<>();
+   LinkedHashMap<FuncSymb, LinkedHashMap<Integer, ArrayList<ArrayList<Integer>>>> exprMap = new LinkedHashMap<>();
+   LinkedHashMap<FuncSymb, LinkedHashSet<Integer>> constMap = new LinkedHashMap<>();
+   LinkedHashMap<String, Integer> qIdxInv = new LinkedHashMap<>();
 
-   public DeterminiserOpt(String ftaId, HashSet transitions, HashSet finalStates, boolean any, boolean dontCare, boolean verbose) {
+   public DeterminiserOpt(String ftaId, LinkedHashSet transitions, LinkedHashSet finalStates, boolean any, boolean dontCare, boolean verbose) {
       this.verbose = verbose;
-      this.psi_glb = new HashMap<>();
-      this.t_inverse_table = new HashMap<>();
+      this.psi_glb = new LinkedHashMap<>();
+      this.t_inverse_table = new LinkedHashMap<>();
       this.ftaId = ftaId;
       idx = new Indices(transitions, finalStates);
       this.any = any;
@@ -67,18 +67,18 @@ public class DeterminiserOpt implements Determiniser {
       }
       Iterator iter;
       int temp, z;
-      HashSet<String> q0;
+      LinkedHashSet<String> q0;
       FuncSymb f;
-      ArrayList<HashSet<BitSet>> phi_f, psi_f;
-      HashSet<BitSet> phi_f_j;
+      ArrayList<LinkedHashSet<BitSet>> phi_f, psi_f;
+      LinkedHashSet<BitSet> phi_f_j;
       ArrayList<ArrayList<BitSet>> psi_phi_tuple;
       ArrayList<BitSet> deltatuple;
       ArrayList<BitSet> newtrs = new ArrayList<>();
 
-      HashMap<FuncSymb, ArrayList<HashSet<BitSet>>> phi
-              = new HashMap<>();
+      LinkedHashMap<FuncSymb, ArrayList<LinkedHashSet<BitSet>>> phi
+              = new LinkedHashMap<>();
 
-      HashSet<HashSet<String>> qdnew, qdold, qdnew1;
+      LinkedHashSet<LinkedHashSet<String>> qdnew, qdold, qdnew1;
 
       iter = idx.sigma.iterator();
       while (iter.hasNext()) {
@@ -107,9 +107,9 @@ public class DeterminiserOpt implements Determiniser {
             phi_f = new ArrayList<>(f.arity);
             t_inverse_table.put(f, new ArrayList<>());
             for (int j = 0; j < f.arity; j++) {
-               psi_f.add(j, new HashSet<>());
-               phi_f.add(j, new HashSet<>());
-               t_inverse_table.get(f).add(j, new HashMap<>());
+               psi_f.add(j, new LinkedHashSet<>());
+               phi_f.add(j, new LinkedHashSet<>());
+               t_inverse_table.get(f).add(j, new LinkedHashMap<>());
                psi_glb.get(f).add(j, new BitSet(idx.delta.size()));
             }
             psi.put(f, psi_f);
@@ -117,11 +117,11 @@ public class DeterminiserOpt implements Determiniser {
          }
       }
 
-      qdnew = (HashSet<HashSet<String>>) qd.clone();
+      qdnew = (LinkedHashSet<LinkedHashSet<String>>) qd.clone();
       deltatuple = new ArrayList<>();
       psi_phi_tuple = new ArrayList<>();
 
-      qdnew1 = new HashSet<>();
+      qdnew1 = new LinkedHashSet<>();
 
       // Compute DFTA States - main loop
       do {
@@ -211,17 +211,17 @@ public class DeterminiserOpt implements Determiniser {
       }
       Iterator i = idx.sigma.iterator();
       FuncSymb f;
-      HashSet<String> q0;
+      LinkedHashSet<String> q0;
       ArrayList<ArrayList<BitSet>> psi_tuple;
       ArrayList<BitSet> deltatuple;
-      ArrayList<HashSet<HashSet<String>>> lhs;
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
       int temp, z;
 
       // make a hashmap yielding canonical names for the elements of qd
-      HashMap<HashSet<String>, HashSet<String>> qdnames = new HashMap<>();
+      LinkedHashMap<LinkedHashSet<String>, LinkedHashSet<String>> qdnames = new LinkedHashMap<>();
       Iterator qdi = qd.iterator();
       while (qdi.hasNext()) {
-         q0 = (HashSet<String>) qdi.next();
+         q0 = (LinkedHashSet<String>) qdi.next();
          qdnames.put(q0, q0);
       }
 
@@ -275,9 +275,9 @@ public class DeterminiserOpt implements Determiniser {
       }
    }
 
-   HashSet<String> rhsSet(BitSet tSet) {
+   LinkedHashSet<String> rhsSet(BitSet tSet) {
       FTATransition t;
-      HashSet<String> result = new HashSet<>();
+      LinkedHashSet<String> result = new LinkedHashSet<>();
       for (int i = tSet.nextSetBit(0); i >= 0; i = tSet.nextSetBit(i + 1)) {
          t = idx.tindex.get(i + 1);
          result.add(t.q0);
@@ -293,13 +293,13 @@ public class DeterminiserOpt implements Determiniser {
       return result;
    }
 
-   HashSet<BitSet> t(int i, FuncSymb f, HashSet<HashSet<String>> qss) {
+   LinkedHashSet<BitSet> t(int i, FuncSymb f, LinkedHashSet<LinkedHashSet<String>> qss) {
       Iterator k = qss.iterator();
-      HashSet<BitSet> result = new HashSet<>();
-      HashSet<String> qs;
+      LinkedHashSet<BitSet> result = new LinkedHashSet<>();
+      LinkedHashSet<String> qs;
       BitSet h;
       while (k.hasNext()) {
-         qs = (HashSet<String>) k.next();
+         qs = (LinkedHashSet<String>) k.next();
          h = lhsSet(i, f, qs);
          if (!h.isEmpty()) {
             result.add(h);
@@ -308,10 +308,10 @@ public class DeterminiserOpt implements Determiniser {
       return result;
    }
 
-   BitSet lhsSet(int i, FuncSymb f, HashSet<String> qs) {
+   BitSet lhsSet(int i, FuncSymb f, LinkedHashSet<String> qs) {
       Iterator k = qs.iterator();
       BitSet result = new BitSet(idx.delta.size());
-      HashMap<String, BitSet> lhsmap = idx.lhsf.get(f).get(i);
+      LinkedHashMap<String, BitSet> lhsmap = idx.lhsf.get(f).get(i);
       String q;
       while (k.hasNext()) {
          q = (String) k.next();
@@ -321,9 +321,9 @@ public class DeterminiserOpt implements Determiniser {
       }
       // Tabulate result for the t_inverse function
       if (!result.isEmpty()) {
-         HashMap<BitSet, HashSet<HashSet<String>>> hm = t_inverse_table.get(f).get(i);
+         LinkedHashMap<BitSet, LinkedHashSet<LinkedHashSet<String>>> hm = t_inverse_table.get(f).get(i);
          if (!hm.containsKey(result)) {
-            hm.put(result, new HashSet<>());
+            hm.put(result, new LinkedHashSet<>());
          }
          hm.get(result).add(qs);
       }
@@ -331,14 +331,14 @@ public class DeterminiserOpt implements Determiniser {
    }
 
    void dontCareArgs(ArrayList<ArrayList<BitSet>> psi_tuple, FuncSymb f) {
-      HashSet<HashSet<String>> qs;
+      LinkedHashSet<LinkedHashSet<String>> qs;
       ArrayList<BitSet> psiIntersectTuple = new ArrayList<>();
       BitSet ts;
-      ArrayList<HashSet<HashSet<String>>> lhs;
-      HashSet<String> rhs;
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
+      LinkedHashSet<String> rhs;
       BitSet temp;
       BitSet deltaj;
-      ArrayList<HashSet<BitSet>> dontCares = new ArrayList<>();
+      ArrayList<LinkedHashSet<BitSet>> dontCares = new ArrayList<>();
 
       // Intersect elements of psi-tuple and initialise don't-care array
       for (int i = 0; i < f.arity; i++) {
@@ -347,7 +347,7 @@ public class DeterminiserOpt implements Determiniser {
          } else {
             psiIntersectTuple.add(i, new BitSet(idx.delta.size()));
          }
-         dontCares.add(i, new HashSet<>());
+         dontCares.add(i, new LinkedHashSet<>());
       }
 
       for (int i = 0; i < f.arity; i++) {
@@ -360,7 +360,7 @@ public class DeterminiserOpt implements Determiniser {
                // generate a don't care transition
                lhs = new ArrayList<>();
                for (int k = 0; k < f.arity; k++) {
-                  lhs.add(k, new HashSet<>());
+                  lhs.add(k, new LinkedHashSet<>());
                   if (k == i) {
                      lhs.set(k, t_inverse_table.get(f).get(i).get(deltaj));
                   }
@@ -370,7 +370,7 @@ public class DeterminiserOpt implements Determiniser {
             } else if (f.arity == 2 && isSingleton(rhs) && intersectsAll(deltaj, i, f, psi_tuple)) {
                lhs = new ArrayList<>();
                for (int k = 0; k < f.arity; k++) {
-                  lhs.add(k, new HashSet<>());
+                  lhs.add(k, new LinkedHashSet<>());
                   if (k == i) {
                      lhs.set(k, t_inverse_table.get(f).get(i).get(deltaj));
                   }
@@ -386,7 +386,7 @@ public class DeterminiserOpt implements Determiniser {
       }
    }
 
-   boolean isSingleton(HashSet<String> s) {
+   boolean isSingleton(LinkedHashSet<String> s) {
       return s.size() == 1;
    }
 
@@ -414,26 +414,26 @@ public class DeterminiserOpt implements Determiniser {
    @Override
    public boolean includes(String q1, String q2) {
       Iterator iter;
-      HashSet<String> q;
+      LinkedHashSet<String> q;
       boolean includes = true;
       iter = qd.iterator();
       while (iter.hasNext() && includes) {
-         q = (HashSet<String>) iter.next();
+         q = (LinkedHashSet<String>) iter.next();
          includes = includes && (!q.contains(q1) || q.contains(q2));
       }
       return includes;
    }
 
 // check inclusion between states in the input FTA
-   public boolean inclusionCheck(HashSet<String> q1, HashSet<String> q2) {
+   public boolean inclusionCheck(LinkedHashSet<String> q1, LinkedHashSet<String> q2) {
       Iterator iter, qiter1, qiter2;
       String x;
-      HashSet<String> q;
+      LinkedHashSet<String> q;
       boolean includes = true;
       boolean b;
       iter = qd.iterator();
       while (iter.hasNext() && includes) {
-         q = (HashSet<String>) iter.next();
+         q = (LinkedHashSet<String>) iter.next();
          qiter1 = q1.iterator();
          while (qiter1.hasNext()) {
             x = (String) qiter1.next();
@@ -453,7 +453,7 @@ public class DeterminiserOpt implements Determiniser {
    }
 
 // check inclusion between states in the input FTA
-   public boolean inclusionCheckState(HashSet<String> q0, HashSet<String> q1, HashSet<String> q2) {
+   public boolean inclusionCheckState(LinkedHashSet<String> q0, LinkedHashSet<String> q1, LinkedHashSet<String> q2) {
       Iterator iter, qiter1, qiter2;
       String x;
       boolean includes = true;
@@ -488,24 +488,24 @@ public class DeterminiserOpt implements Determiniser {
    public void printDftaDatalog(PrintStream output) {
       PTransition t;
       FuncSymb f;
-      HashSet<String> q0;
+      LinkedHashSet<String> q0;
       int n;
 
-      ArrayList<HashSet<HashSet<String>>> lhs;
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
       ArrayList<String> args;
-      HashMap<HashSet<HashSet<String>>, String> productNames = new HashMap<>();
-      HashMap<HashSet<String>, String> stateNames = new HashMap<>();
+      LinkedHashMap<LinkedHashSet<LinkedHashSet<String>>, String> productNames = new LinkedHashMap<>();
+      LinkedHashMap<LinkedHashSet<String>, String> stateNames = new LinkedHashMap<>();
       String head, body;
 
       // make state names q0, q1,... from elements of qd
       // print dictionary of state names as comments
       Iterator iter = qd.iterator();
       Iterator iter1;
-      HashSet<String> q;
+      LinkedHashSet<String> q;
       int j = 0;
       output.println();
       while (iter.hasNext()) {
-         q = (HashSet<String>) iter.next();
+         q = (LinkedHashSet<String>) iter.next();
          stateNames.put(q, "qq" + j);
          j++;
          output.println("### " + q + " --> " + stateNames.get(q));
@@ -534,7 +534,7 @@ public class DeterminiserOpt implements Determiniser {
                args.add(m, "X" + m);
             } else {
                iter1 = lhs.get(m).iterator();
-               args.add(m, stateNames.get((HashSet<String>) iter1.next())); // singleton product state
+               args.add(m, stateNames.get((LinkedHashSet<String>) iter1.next())); // singleton product state
             }
          }
          head = f.datalogName() + "(";
@@ -565,10 +565,10 @@ public class DeterminiserOpt implements Determiniser {
       output.println();
       output.println("### Product states");
       iter = productNames.keySet().iterator();
-      HashSet<HashSet<String>> product;
+      LinkedHashSet<LinkedHashSet<String>> product;
       String pName;
       while (iter.hasNext()) {
-         product = (HashSet<HashSet<String>>) iter.next();
+         product = (LinkedHashSet<LinkedHashSet<String>>) iter.next();
          pName = productNames.get(product);
          head = pName + "(";
          if (product.isEmpty()) {
@@ -576,7 +576,7 @@ public class DeterminiserOpt implements Determiniser {
          }
          iter1 = product.iterator();
          while (iter1.hasNext()) {
-            output.println(head + stateNames.get((HashSet<String>) iter1.next()) + ").");
+            output.println(head + stateNames.get((LinkedHashSet<String>) iter1.next()) + ").");
          }
       }
    }
@@ -586,11 +586,11 @@ public class DeterminiserOpt implements Determiniser {
       double tcount;
       double argsize;
       double qdsize = qd.size();
-      ArrayList<HashSet<HashSet<String>>> lhs;
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> lhs;
       for (PTransition deltad1 : deltad) {
          lhs = deltad1.lhs;
          tcount = 1.0;
-         for (HashSet<HashSet<String>> lh : lhs) {
+         for (LinkedHashSet<LinkedHashSet<String>> lh : lhs) {
             argsize = lh.size();
             if (argsize == 0) {
                argsize = qdsize;  // don't care argument
@@ -664,7 +664,7 @@ public class DeterminiserOpt implements Determiniser {
 
 
    
-   public HashSet<HashSet<String>> getQd() {
+   public LinkedHashSet<LinkedHashSet<String>> getQd() {
       return qd;
    }
 
@@ -685,7 +685,7 @@ public class DeterminiserOpt implements Determiniser {
       Iterator i;
       i = qd.iterator();
       while (i.hasNext()) {
-         System.out.println((HashSet<String>) i.next());
+         System.out.println((LinkedHashSet<String>) i.next());
       }
    }
 
@@ -696,8 +696,8 @@ public class DeterminiserOpt implements Determiniser {
       }
    }
 
-   HashSet<BitSet> intersectCartProd(ArrayList<ArrayList<BitSet>> psi_phi_tuple, int k) {
-      HashSet<BitSet> result = new HashSet<>();
+   LinkedHashSet<BitSet> intersectCartProd(ArrayList<ArrayList<BitSet>> psi_phi_tuple, int k) {
+      LinkedHashSet<BitSet> result = new LinkedHashSet<>();
       BitSet t;
       if (k == psi_phi_tuple.size() - 1) {
          for (int i = 0; i < psi_phi_tuple.get(k).size(); i++) {
@@ -705,7 +705,7 @@ public class DeterminiserOpt implements Determiniser {
          }
          return result;
       } else {
-         HashSet<BitSet> r = intersectCartProd(psi_phi_tuple, k + 1);
+         LinkedHashSet<BitSet> r = intersectCartProd(psi_phi_tuple, k + 1);
          Iterator i = r.iterator();
          while (i.hasNext()) {
             t = (BitSet) i.next();

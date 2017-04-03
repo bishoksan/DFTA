@@ -1,8 +1,8 @@
 package dfta;
 
 import java.util.Iterator;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.io.PrintStream;
@@ -13,10 +13,10 @@ public class DeterminiserTextBook implements Determiniser {
    Indices idx;
    boolean verbose;
 
-   HashSet<HashSet<String>> qd = new HashSet<>();
+   LinkedHashSet<LinkedHashSet<String>> qd = new LinkedHashSet<>();
    ArrayList<DTransition> deltad = new ArrayList<>();
 
-   public DeterminiserTextBook(HashSet transitions, HashSet finalStates, boolean any, boolean verbose) {
+   public DeterminiserTextBook(LinkedHashSet transitions, LinkedHashSet finalStates, boolean any, boolean verbose) {
       idx = new Indices(transitions, finalStates);
       idx.genDelta("");
       idx.genFinalStates("");
@@ -38,19 +38,19 @@ public class DeterminiserTextBook implements Determiniser {
       }
       Iterator iter;
       int temp;
-      HashSet<String> q0;
+      LinkedHashSet<String> q0;
       FuncSymb f;
-      ArrayList<HashSet<String>> qtuple;
+      ArrayList<LinkedHashSet<String>> qtuple;
       ArrayList<BitSet> deltatuple;
 
-      HashSet<HashSet<String>> qdold;
-      ArrayList<ArrayList<HashSet<String>>> qdoldarray;
+      LinkedHashSet<LinkedHashSet<String>> qdold;
+      ArrayList<ArrayList<LinkedHashSet<String>>> qdoldarray;
       boolean newTransition;
 
       // Compute DFTA States - main loop
       do {
          newTransition = false;
-         qdold = (HashSet<HashSet<String>>) qd.clone();
+         qdold = (LinkedHashSet<LinkedHashSet<String>>) qd.clone();
 
          iter = idx.sigma.iterator();
          while (iter.hasNext()) {
@@ -93,9 +93,9 @@ public class DeterminiserTextBook implements Determiniser {
       } while (newTransition);
    }
 
-   HashSet<String> rhsSet(BitSet tSet) {
+   LinkedHashSet<String> rhsSet(BitSet tSet) {
       FTATransition t;
-      HashSet<String> result = new HashSet<>();
+      LinkedHashSet<String> result = new LinkedHashSet<>();
       for (int i = tSet.nextSetBit(0); i >= 0; i = tSet.nextSetBit(i + 1)) {
          t = idx.tindex.get(i + 1);
          result.add(t.q0);
@@ -111,10 +111,10 @@ public class DeterminiserTextBook implements Determiniser {
       return result;
    }
 
-   BitSet lhsSet(int i, FuncSymb f, HashSet<String> qs) {
+   BitSet lhsSet(int i, FuncSymb f, LinkedHashSet<String> qs) {
       Iterator k = qs.iterator();
       BitSet result = new BitSet();
-      HashMap<String, BitSet> lhsmap = idx.lhsf.get(f).get(i);
+      LinkedHashMap<String, BitSet> lhsmap = idx.lhsf.get(f).get(i);
       String q;
       while (k.hasNext()) {
          q = (String) k.next();
@@ -125,7 +125,7 @@ public class DeterminiserTextBook implements Determiniser {
       return result;
    }
 
-   boolean addTransition(FuncSymb f, HashSet<String> q0, ArrayList<HashSet<String>> lhs) {
+   boolean addTransition(FuncSymb f, LinkedHashSet<String> q0, ArrayList<LinkedHashSet<String>> lhs) {
       DTransition d1;
       for (DTransition deltad1 : deltad) {
          d1 = deltad1;
@@ -143,11 +143,11 @@ public class DeterminiserTextBook implements Determiniser {
    @Override
    public boolean includes(String q1, String q2) {
       Iterator iter;
-      HashSet<String> q;
+      LinkedHashSet<String> q;
       boolean includes = true;
       iter = qd.iterator();
       while (iter.hasNext() && includes) {
-         q = (HashSet<String>) iter.next();
+         q = (LinkedHashSet<String>) iter.next();
          includes = includes && (!q.contains(q1) || q.contains(q2));
       }
       return includes;
@@ -170,23 +170,23 @@ public class DeterminiserTextBook implements Determiniser {
    public void printDftaDatalog(PrintStream output) {
       DTransition t;
       FuncSymb f;
-      HashSet<String> q0;
+      LinkedHashSet<String> q0;
       int n;
 
-      ArrayList<HashSet<String>> lhs;
+      ArrayList<LinkedHashSet<String>> lhs;
       ArrayList<String> args;
-      HashMap<HashSet<String>, String> stateNames = new HashMap<>();
+      LinkedHashMap<LinkedHashSet<String>, String> stateNames = new LinkedHashMap<>();
       String head, body;
 
       // make state names q0, q1,... from elements of qd
       // print dictionary of state names as comments
       Iterator iter = qd.iterator();
       Iterator iter1;
-      HashSet<String> q;
+      LinkedHashSet<String> q;
       int j = 0;
       output.println();
       while (iter.hasNext()) {
-         q = (HashSet<String>) iter.next();
+         q = (LinkedHashSet<String>) iter.next();
          stateNames.put(q, "qq" + j);
          j++;
          output.println("### " + q + " --> " + stateNames.get(q));
@@ -244,7 +244,7 @@ public class DeterminiserTextBook implements Determiniser {
         ja.append("Number of DFTA transitions = " + deltad.size() + "\n");
     }
 
-   public HashSet<HashSet<String>> getQd() {
+   public LinkedHashSet<LinkedHashSet<String>> getQd() {
       return qd;
    }
 
