@@ -291,10 +291,11 @@ public class DeterminiserApp extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        // TODO add your handling code here:
-       fc = new JFileChooser();
+       fc = new JFileChooser(file);
        int returnVal = fc.showOpenDialog(DeterminiserApp.this);
        if (returnVal == JFileChooser.APPROVE_OPTION) {
           file = fc.getSelectedFile();
+          fc.setCurrentDirectory(file);
           //This is where a real application would open the file.
           System.out.println("Opening: " + file.getName() + ".");
        } else {
@@ -308,9 +309,9 @@ public class DeterminiserApp extends javax.swing.JDialog {
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
    private int showDialog() {
-      JOptionPane pane = new JOptionPane("input file missing, plese select a file");
+      JOptionPane pane = new JOptionPane("input file missing, please select a file");
 
-      JDialog dialog = pane.createDialog(JDialog1, "chose a file");
+      JDialog dialog = pane.createDialog(JDialog1, "choose a file");
       dialog.show();
       Object selectedValue = pane.getValue();
       if (selectedValue == null) {
@@ -382,7 +383,7 @@ public class DeterminiserApp extends javax.swing.JDialog {
           try {
              File destFile = fc1.getSelectedFile();
              File sourceFile = new File(outputFile);
-             System.out.println("sour dest " + sourceFile.getAbsolutePath() + " " + destFile.getAbsolutePath());
+             System.out.println("source dest " + sourceFile.getAbsolutePath() + " " + destFile.getAbsolutePath());
              Determinise.copyFile(sourceFile, destFile);
              System.out.println("file copied succ");
           } catch (Exception ex) {
