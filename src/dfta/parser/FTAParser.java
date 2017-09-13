@@ -135,7 +135,14 @@ public class FTAParser implements FTAParserConstants {
 
   static final public StateList StateList() throws ParseException {
    NodeListOptional n0 = new NodeListOptional();
-   Ident n1;
+   NodeSequence n1;
+   Ident n2;
+   NodeOptional n3;
+   NodeSequence n4;
+   NodeToken n5;
+   Token n6;
+   NodeToken n7;
+   Token n8;
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -147,7 +154,26 @@ public class FTAParser implements FTAParserConstants {
         jj_la1[2] = jj_gen;
         break label_2;
       }
-      n1 = Ident();
+        n3 = new NodeOptional();
+        n1 = new NodeSequence(2);
+      n2 = Ident();
+        n1.addNode(n2);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COLON:
+           n4 = new NodeSequence(2);
+        n6 = jj_consume_token(COLON);
+                      n5 = JTBToolkit.makeNodeToken(n6);
+           n4.addNode(n5);
+        n8 = jj_consume_token(NUMBER);
+                       n7 = JTBToolkit.makeNodeToken(n8);
+           n4.addNode(n7);
+           n3.addNode(n4);
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        ;
+      }
+        n1.addNode(n3);
         n0.addNode(n1);
     }
      n0.nodes.trimToSize();
@@ -177,7 +203,7 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[4] = jj_gen;
         break label_3;
       }
       n6 = Ident();
@@ -215,7 +241,7 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[4] = jj_gen;
+        jj_la1[5] = jj_gen;
         break label_4;
       }
       n1 = Transition();
@@ -245,7 +271,7 @@ public class FTAParser implements FTAParserConstants {
         n0.addNode(n1);
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[6] = jj_gen;
       ;
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -260,7 +286,7 @@ public class FTAParser implements FTAParserConstants {
         n2.addNode(n3);
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[7] = jj_gen;
       ;
     }
     n8 = PrologTransitions();
@@ -295,7 +321,7 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         break label_5;
       }
       n6 = Ident();
@@ -327,7 +353,7 @@ public class FTAParser implements FTAParserConstants {
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
         break label_6;
       }
         n1 = new NodeSequence(3);
@@ -472,7 +498,7 @@ public class FTAParser implements FTAParserConstants {
               ;
               break;
             default:
-              jj_la1[9] = jj_gen;
+              jj_la1[10] = jj_gen;
               break label_7;
             }
                     n11 = new NodeSequence(2);
@@ -488,7 +514,7 @@ public class FTAParser implements FTAParserConstants {
                  n7.addNode(n8);
           break;
         default:
-          jj_la1[10] = jj_gen;
+          jj_la1[11] = jj_gen;
           ;
         }
               n4.addNode(n7);
@@ -542,7 +568,7 @@ public class FTAParser implements FTAParserConstants {
               n3 = new NodeChoice(n33, 4);
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -576,7 +602,7 @@ public class FTAParser implements FTAParserConstants {
               n47 = new NodeChoice(n50, 1);
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[13] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -621,7 +647,7 @@ public class FTAParser implements FTAParserConstants {
               n56 = new NodeChoice(n66, 1);
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -647,7 +673,7 @@ public class FTAParser implements FTAParserConstants {
               n75 = new NodeChoice(n78, 1);
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[15] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -663,7 +689,7 @@ public class FTAParser implements FTAParserConstants {
         n0 = new NodeChoice(n71, 4);
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[16] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -689,7 +715,7 @@ public class FTAParser implements FTAParserConstants {
         n0 = new NodeChoice(n3, 1);
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -703,13 +729,13 @@ public class FTAParser implements FTAParserConstants {
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[17];
+  static final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
   static {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x12c016a1,0x2000000,0x12000000,0x12000000,0x12c01400,0x20,0x80,0x12000000,0x12c01400,0x10000,0x12000000,0x690400,0x12800000,0x12002000,0x210000,0x12c01400,0x12000000,};
+      jj_la1_0 = new int[] {0x12c016a1,0x2000000,0x12000000,0x20000,0x12000000,0x12c01400,0x20,0x80,0x12000000,0x12c01400,0x10000,0x12000000,0x690400,0x12800000,0x12002000,0x210000,0x12c01400,0x12000000,};
    }
 
   public FTAParser(java.io.InputStream stream) {
@@ -728,7 +754,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.InputStream stream) {
@@ -740,7 +766,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   public FTAParser(java.io.Reader stream) {
@@ -756,7 +782,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.Reader stream) {
@@ -765,7 +791,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   public FTAParser(FTAParserTokenManager tm) {
@@ -780,7 +806,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(FTAParserTokenManager tm) {
@@ -788,7 +814,7 @@ public class FTAParser implements FTAParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   static final private Token jj_consume_token(int kind) throws ParseException {
@@ -843,7 +869,7 @@ public class FTAParser implements FTAParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 18; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
