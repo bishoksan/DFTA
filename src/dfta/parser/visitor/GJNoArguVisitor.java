@@ -72,7 +72,7 @@ public interface GJNoArguVisitor<R> {
    public R visit(States n);
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public R visit(StateList n);
 

@@ -40,6 +40,8 @@ TOKEN :
    <FINAL: "Final">
    | <STATES: "States">
    | <TRANSITIONS: "Transitions">
+   | <AUTOMATON: "Automaton">
+   | <OPS: "Ops">
    | <LBRACE: "(">
    | <RBRACE: ")">
    | <LSQBRACE: "[">
@@ -47,6 +49,7 @@ TOKEN :
    | <VERTBAR: "|">
    | <UNDERSCORE: "_">
    | <COMMA: ",">
+   | <COLON: ":">
    | <FULLSTOP: ".">
    | <ARROW: "->">
    | <QUOTE: "'">
@@ -63,7 +66,7 @@ TOKEN :
 TOKEN :
 {
    <IDENTIFIER: <LETTER> (<LETTER> | <DIGIT> | <UNDERSCORE>)*>
-   | <#LETTER: (["A"-"Z"] | ["a"-"z"] | "_")>
+   | <#LETTER: (["A"-"Z"] | ["a"-"z"])>
    | <#DIGIT: ["0"-"9"]>
 }
 
@@ -81,15 +84,254 @@ SPECIAL_TOKEN :
 
 FTA FTA() :
 {
+   NodeChoice n0;
+   TimbukFTA n1;
+   PrologFTA n2;
+
+   
+}
+{
+   (
+      (
+         n1=TimbukFTA()
+         { n0 = new NodeChoice(n1, 0); }
+      |
+         n2=PrologFTA()
+         { n0 = new NodeChoice(n2, 1); }
+      )
+      
+   )
+   
+   { return new FTA(n0); }
+}
+
+TimbukFTA TimbukFTA() :
+{
+   OpsDecls n0;
+   Automaton n1;
+   States n2;
+   FinalStates n3;
+   TimbukTransitions n4;
+   NodeToken n5;
+   Token n6;
+
+   
+}
+{
+   n0=OpsDecls()
+   n1=Automaton()
+   n2=States()
+   n3=FinalStates()
+   n4=TimbukTransitions()
+   n6=<EOF> { 
+      n6.beginColumn++; n6.endColumn++;
+      n5 = JTBToolkit.makeNodeToken(n6);
+   }
+   
+   { return new TimbukFTA(n0,n1,n2,n3,n4,n5); }
+}
+
+OpsDecls OpsDecls() :
+{
+   NodeToken n0;
+   Token n1;
+   LabelList n2;
+
+   
+}
+{
+   n1=<OPS> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n2=LabelList()
+   
+   { return new OpsDecls(n0,n2); }
+}
+
+LabelList LabelList() :
+{
+   NodeListOptional n0 = new NodeListOptional();
+   LabelDecl n1;
+
+   
+}
+{
+   (
+      n1=LabelDecl()
+      { n0.addNode(n1); }
+   )*
+   { n0.nodes.trimToSize(); }
+   
+   { return new LabelList(n0); }
+}
+
+LabelDecl LabelDecl() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   NodeToken n4;
+   Token n5;
+
+   
+}
+{
+   n1=<IDENTIFIER> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3=<COLON> { n2 = JTBToolkit.makeNodeToken(n3); }
+   n5=<NUMBER> { n4 = JTBToolkit.makeNodeToken(n5); }
+   
+   { return new LabelDecl(n0,n2,n4); }
+}
+
+Automaton Automaton() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+
+   
+}
+{
+   n1=<AUTOMATON> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3=<IDENTIFIER> { n2 = JTBToolkit.makeNodeToken(n3); }
+   
+   { return new Automaton(n0,n2); }
+}
+
+States States() :
+{
+   NodeToken n0;
+   Token n1;
+   StateList n2;
+
+   
+}
+{
+   n1=<STATES> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n2=StateList()
+   
+   { return new States(n0,n2); }
+}
+
+StateList StateList() :
+{
+   NodeListOptional n0 = new NodeListOptional();
+   NodeSequence n1;
+   Ident n2;
+   NodeOptional n3;
+   NodeSequence n4;
+   NodeToken n5;
+   Token n6;
+   NodeToken n7;
+   Token n8;
+
+   
+}
+{
+   (
+      { n3 = new NodeOptional(); }
+      { n1 = new NodeSequence(2); }
+      n2=Ident()
+      { n1.addNode(n2); }
+      (
+         { n4 = new NodeSequence(2); }
+         n6=<COLON> { n5 = JTBToolkit.makeNodeToken(n6); }
+         { n4.addNode(n5); }
+         n8=<NUMBER> { n7 = JTBToolkit.makeNodeToken(n8); }
+         { n4.addNode(n7); }
+         { n3.addNode(n4); }
+      )?
+      { n1.addNode(n3); }
+      { n0.addNode(n1); }
+   )*
+   { n0.nodes.trimToSize(); }
+   
+   { return new StateList(n0); }
+}
+
+FinalStates FinalStates() :
+{
+   NodeToken n0;
+   Token n1;
+   NodeToken n2;
+   Token n3;
+   Ident n4;
+   NodeListOptional n5 = new NodeListOptional();
+   Ident n6;
+
+   
+}
+{
+   n1=<FINAL> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n3=<STATES> { n2 = JTBToolkit.makeNodeToken(n3); }
+   n4=Ident()
+   
+   {
+      finalStates.add(((NodeToken)n4.f0.choice).tokenImage);
+   }
+   
+   (
+      n6=Ident()
+      
+      {
+         finalStates.add(((NodeToken)n6.f0.choice).tokenImage);
+      }
+      
+      { n5.addNode(n6); }
+   )*
+   { n5.nodes.trimToSize(); }
+   
+   { return new FinalStates(n0,n2,n4,n5); }
+}
+
+TimbukTransitions TimbukTransitions() :
+{
+   NodeToken n0;
+   Token n1;
+   TimbukTransitionList n2;
+
+   
+}
+{
+   n1=<TRANSITIONS> { n0 = JTBToolkit.makeNodeToken(n1); }
+   n2=TimbukTransitionList()
+   
+   { return new TimbukTransitions(n0,n2); }
+}
+
+TimbukTransitionList TimbukTransitionList() :
+{
+   NodeListOptional n0 = new NodeListOptional();
+   Transition n1;
+
+   
+}
+{
+   (
+      n1=Transition()
+      
+      {
+         transitions.add(n1);
+      }
+      
+      { n0.addNode(n1); }
+   )*
+   { n0.nodes.trimToSize(); }
+   
+   { return new TimbukTransitionList(n0); }
+}
+
+PrologFTA PrologFTA() :
+{
    NodeOptional n0 = new NodeOptional();
-   FinalStates n1;
+   PrologFinalStates n1;
    NodeOptional n2 = new NodeOptional();
    NodeSequence n3;
    NodeToken n4;
    Token n5;
    NodeToken n6;
    Token n7;
-   Delta n8;
+   PrologTransitions n8;
    NodeToken n9;
    Token n10;
 
@@ -97,7 +339,7 @@ FTA FTA() :
 }
 {
    (
-      n1=FinalStates()
+      n1=PrologFinalStates()
       { n0.addNode(n1); }
    )?
    (
@@ -108,16 +350,16 @@ FTA FTA() :
       { n3.addNode(n6); }
       { n2.addNode(n3); }
    )?
-   n8=Delta()
+   n8=PrologTransitions()
    n10=<EOF> { 
       n10.beginColumn++; n10.endColumn++;
       n9 = JTBToolkit.makeNodeToken(n10);
    }
    
-   { return new FTA(n0,n2,n8,n9); }
+   { return new PrologFTA(n0,n2,n8,n9); }
 }
 
-FinalStates FinalStates() :
+PrologFinalStates PrologFinalStates() :
 {
    NodeToken n0;
    Token n1;
@@ -152,280 +394,50 @@ FinalStates FinalStates() :
    { n5.nodes.trimToSize(); }
    n8=<FULLSTOP> { n7 = JTBToolkit.makeNodeToken(n8); }
    
-   { return new FinalStates(n0,n2,n4,n5,n7); }
+   { return new PrologFinalStates(n0,n2,n4,n5,n7); }
 }
 
-Delta Delta() :
+PrologTransitions PrologTransitions() :
 {
    NodeListOptional n0 = new NodeListOptional();
-   Transition n1;
+   NodeSequence n1;
+   Transition n2;
+   NodeToken n3;
+   Token n4;
 
    
 }
 {
    (
-      n1=Transition()
+      { n1 = new NodeSequence(3); }
+      n2=Transition()
+      { n1.addNode(n2); }
+      n4=<FULLSTOP> { n3 = JTBToolkit.makeNodeToken(n4); }
+      { n1.addNode(n3); }
       
       {
-         transitions.add(n1);
+         transitions.add(n2);
       }
       
       { n0.addNode(n1); }
    )*
    { n0.nodes.trimToSize(); }
    
-   { return new Delta(n0); }
+   { return new PrologTransitions(n0); }
 }
 
 Transition Transition() :
 {
    LHS n0;
    RHS n1;
-   NodeToken n2;
-   Token n3;
 
    
 }
 {
    n0=LHS()
    n1=RHS()
-   n3=<FULLSTOP> { n2 = JTBToolkit.makeNodeToken(n3); }
    
-   { return new Transition(n0,n1,n2); }
-}
-
-LHS LHS() :
-{
-   NodeChoice n0;
-   NodeSequence n1;
-   Ident n2;
-   NodeChoice n3;
-   NodeSequence n4;
-   NodeToken n5;
-   Token n6;
-   Ident n7;
-   NodeListOptional n8 = new NodeListOptional();
-   NodeSequence n9;
-   NodeToken n10;
-   Token n11;
-   Ident n12;
-   NodeToken n13;
-   Token n14;
-   NodeToken n15;
-   Token n16;
-   NodeToken n17;
-   Token n18;
-   NodeSequence n19;
-   NodeToken n20;
-   Token n21;
-   Ident n22;
-   NodeToken n23;
-   Token n24;
-   NodeSequence n25;
-   NodeToken n26;
-   Token n27;
-   Ident n28;
-   NodeToken n29;
-   Token n30;
-   NodeSequence n31;
-   NodeToken n32;
-   Token n33;
-   Ident n34;
-   NodeToken n35;
-   Token n36;
-   NodeSequence n37;
-   NodeToken n38;
-   Token n39;
-   NodeToken n40;
-   Token n41;
-   NodeSequence n42;
-   NodeToken n43;
-   Token n44;
-   NodeChoice n45;
-   NodeToken n46;
-   Token n47;
-   Ident n48;
-   NodeToken n49;
-   Token n50;
-   NodeSequence n51;
-   NodeToken n52;
-   Token n53;
-   NodeChoice n54;
-   NodeSequence n55;
-   Ident n56;
-   NodeToken n57;
-   Token n58;
-   Ident n59;
-   NodeToken n60;
-   Token n61;
-   NodeToken n62;
-   Token n63;
-   NodeSequence n64;
-   NodeToken n65;
-   Token n66;
-   NodeToken n67;
-   Token n68;
-   NodeSequence n69;
-   NodeToken n70;
-   Token n71;
-   Ident n72;
-   NodeChoice n73;
-   NodeToken n74;
-   Token n75;
-   NodeToken n76;
-   Token n77;
-   Ident n78;
-   NodeToken n79;
-   Token n80;
-   NodeToken n81;
-   Token n82;
-
-   
-}
-{
-   (
-      { n1 = new NodeSequence(2); }
-      n2=Ident()
-      { n1.addNode(n2); }
-      (
-         (
-            { n4 = new NodeSequence(5); }
-            n6=<LBRACE> { n5 = JTBToolkit.makeNodeToken(n6); }
-            { n4.addNode(n5); }
-            n7=Ident()
-            { n4.addNode(n7); }
-            (
-               { n9 = new NodeSequence(2); }
-               n11=<COMMA> { n10 = JTBToolkit.makeNodeToken(n11); }
-               { n9.addNode(n10); }
-               n12=Ident()
-               { n9.addNode(n12); }
-               { n8.addNode(n9); }
-            )*
-            { n8.nodes.trimToSize(); }
-            { n4.addNode(n8); }
-            n14=<RBRACE> { n13 = JTBToolkit.makeNodeToken(n14); }
-            { n4.addNode(n13); }
-            n16=<ARROW> { n15 = JTBToolkit.makeNodeToken(n16); }
-            { n4.addNode(n15); }
-            { n3 = new NodeChoice(n4, 0); }
-         |
-            n18=<ARROW> { n17 = JTBToolkit.makeNodeToken(n18); }
-            { n3 = new NodeChoice(n17, 1); }
-         |
-            { n19 = new NodeSequence(3); }
-            n21=<BINOP> { n20 = JTBToolkit.makeNodeToken(n21); }
-            { n19.addNode(n20); }
-            n22=Ident()
-            { n19.addNode(n22); }
-            n24=<ARROW> { n23 = JTBToolkit.makeNodeToken(n24); }
-            { n19.addNode(n23); }
-            { n3 = new NodeChoice(n19, 2); }
-         |
-            { n25 = new NodeSequence(3); }
-            n27=<ANYOP> { n26 = JTBToolkit.makeNodeToken(n27); }
-            { n25.addNode(n26); }
-            n28=Ident()
-            { n25.addNode(n28); }
-            n30=<ARROW> { n29 = JTBToolkit.makeNodeToken(n30); }
-            { n25.addNode(n29); }
-            { n3 = new NodeChoice(n25, 3); }
-         |
-            { n31 = new NodeSequence(3); }
-            n33=<COMMA> { n32 = JTBToolkit.makeNodeToken(n33); }
-            { n31.addNode(n32); }
-            n34=Ident()
-            { n31.addNode(n34); }
-            n36=<ARROW> { n35 = JTBToolkit.makeNodeToken(n36); }
-            { n31.addNode(n35); }
-            { n3 = new NodeChoice(n31, 4); }
-         )
-         
-      )
-      { n1.addNode(n3); }
-      { n0 = new NodeChoice(n1, 0); }
-   |
-      { n37 = new NodeSequence(2); }
-      n39=<NUMBER> { n38 = JTBToolkit.makeNodeToken(n39); }
-      { n37.addNode(n38); }
-      n41=<ARROW> { n40 = JTBToolkit.makeNodeToken(n41); }
-      { n37.addNode(n40); }
-      { n0 = new NodeChoice(n37, 1); }
-   |
-      { n42 = new NodeSequence(3); }
-      n44=<ANYOP> { n43 = JTBToolkit.makeNodeToken(n44); }
-      { n42.addNode(n43); }
-      (
-         (
-            n47=<NUMBER> { n46 = JTBToolkit.makeNodeToken(n47); }
-            { n45 = new NodeChoice(n46, 0); }
-         |
-            n48=Ident()
-            { n45 = new NodeChoice(n48, 1); }
-         )
-         
-      )
-      { n42.addNode(n45); }
-      n50=<ARROW> { n49 = JTBToolkit.makeNodeToken(n50); }
-      { n42.addNode(n49); }
-      { n0 = new NodeChoice(n42, 2); }
-   |
-      { n51 = new NodeSequence(2); }
-      n53=<LSQBRACE> { n52 = JTBToolkit.makeNodeToken(n53); }
-      { n51.addNode(n52); }
-      (
-         (
-            { n55 = new NodeSequence(5); }
-            n56=Ident()
-            { n55.addNode(n56); }
-            n58=<VERTBAR> { n57 = JTBToolkit.makeNodeToken(n58); }
-            { n55.addNode(n57); }
-            n59=Ident()
-            { n55.addNode(n59); }
-            n61=<RSQBRACE> { n60 = JTBToolkit.makeNodeToken(n61); }
-            { n55.addNode(n60); }
-            n63=<ARROW> { n62 = JTBToolkit.makeNodeToken(n63); }
-            { n55.addNode(n62); }
-            { n54 = new NodeChoice(n55, 0); }
-         |
-            { n64 = new NodeSequence(2); }
-            n66=<RSQBRACE> { n65 = JTBToolkit.makeNodeToken(n66); }
-            { n64.addNode(n65); }
-            n68=<ARROW> { n67 = JTBToolkit.makeNodeToken(n68); }
-            { n64.addNode(n67); }
-            { n54 = new NodeChoice(n64, 1); }
-         )
-         
-      )
-      { n51.addNode(n54); }
-      { n0 = new NodeChoice(n51, 3); }
-   |
-      { n69 = new NodeSequence(6); }
-      n71=<LBRACE> { n70 = JTBToolkit.makeNodeToken(n71); }
-      { n69.addNode(n70); }
-      n72=Ident()
-      { n69.addNode(n72); }
-      (
-         (
-            n75=<COMMA> { n74 = JTBToolkit.makeNodeToken(n75); }
-            { n73 = new NodeChoice(n74, 0); }
-         |
-            n77=<BINOP> { n76 = JTBToolkit.makeNodeToken(n77); }
-            { n73 = new NodeChoice(n76, 1); }
-         )
-         
-      )
-      { n69.addNode(n73); }
-      n78=Ident()
-      { n69.addNode(n78); }
-      n80=<RBRACE> { n79 = JTBToolkit.makeNodeToken(n80); }
-      { n69.addNode(n79); }
-      n82=<ARROW> { n81 = JTBToolkit.makeNodeToken(n82); }
-      { n69.addNode(n81); }
-      { n0 = new NodeChoice(n69, 4); }
-   )
-   
-   { return new LHS(n0); }
+   { return new Transition(n0,n1); }
 }
 
 RHS RHS() :
@@ -438,6 +450,248 @@ RHS RHS() :
    n0=Ident()
    
    { return new RHS(n0); }
+}
+
+LHS LHS() :
+{
+   NodeChoice n0;
+   NodeSequence n1;
+   Ident n2;
+   NodeChoice n3;
+   NodeSequence n4;
+   NodeToken n5;
+   Token n6;
+   NodeOptional n7 = new NodeOptional();
+   NodeSequence n8;
+   Ident n9;
+   NodeListOptional n10;
+   NodeSequence n11;
+   NodeToken n12;
+   Token n13;
+   Ident n14;
+   NodeToken n15;
+   Token n16;
+   NodeToken n17;
+   Token n18;
+   NodeToken n19;
+   Token n20;
+   NodeSequence n21;
+   NodeToken n22;
+   Token n23;
+   Ident n24;
+   NodeToken n25;
+   Token n26;
+   NodeSequence n27;
+   NodeToken n28;
+   Token n29;
+   Ident n30;
+   NodeToken n31;
+   Token n32;
+   NodeSequence n33;
+   NodeToken n34;
+   Token n35;
+   Ident n36;
+   NodeToken n37;
+   Token n38;
+   NodeSequence n39;
+   NodeToken n40;
+   Token n41;
+   NodeToken n42;
+   Token n43;
+   NodeSequence n44;
+   NodeToken n45;
+   Token n46;
+   NodeChoice n47;
+   NodeToken n48;
+   Token n49;
+   Ident n50;
+   NodeToken n51;
+   Token n52;
+   NodeSequence n53;
+   NodeToken n54;
+   Token n55;
+   NodeChoice n56;
+   NodeSequence n57;
+   Ident n58;
+   NodeToken n59;
+   Token n60;
+   Ident n61;
+   NodeToken n62;
+   Token n63;
+   NodeToken n64;
+   Token n65;
+   NodeSequence n66;
+   NodeToken n67;
+   Token n68;
+   NodeToken n69;
+   Token n70;
+   NodeSequence n71;
+   NodeToken n72;
+   Token n73;
+   Ident n74;
+   NodeChoice n75;
+   NodeToken n76;
+   Token n77;
+   NodeToken n78;
+   Token n79;
+   Ident n80;
+   NodeToken n81;
+   Token n82;
+   NodeToken n83;
+   Token n84;
+
+   
+}
+{
+   (
+      { n1 = new NodeSequence(2); }
+      n2=Ident()
+      { n1.addNode(n2); }
+      (
+         (
+            { n4 = new NodeSequence(4); }
+            n6=<LBRACE> { n5 = JTBToolkit.makeNodeToken(n6); }
+            { n4.addNode(n5); }
+            (
+               { n10 = new NodeListOptional(); }
+               { n8 = new NodeSequence(2); }
+               n9=Ident()
+               { n8.addNode(n9); }
+               (
+                  { n11 = new NodeSequence(2); }
+                  n13=<COMMA> { n12 = JTBToolkit.makeNodeToken(n13); }
+                  { n11.addNode(n12); }
+                  n14=Ident()
+                  { n11.addNode(n14); }
+                  { n10.addNode(n11); }
+               )*
+               { n10.nodes.trimToSize(); }
+               { n8.addNode(n10); }
+               { n7.addNode(n8); }
+            )?
+            { n4.addNode(n7); }
+            n16=<RBRACE> { n15 = JTBToolkit.makeNodeToken(n16); }
+            { n4.addNode(n15); }
+            n18=<ARROW> { n17 = JTBToolkit.makeNodeToken(n18); }
+            { n4.addNode(n17); }
+            { n3 = new NodeChoice(n4, 0); }
+         |
+            n20=<ARROW> { n19 = JTBToolkit.makeNodeToken(n20); }
+            { n3 = new NodeChoice(n19, 1); }
+         |
+            { n21 = new NodeSequence(3); }
+            n23=<BINOP> { n22 = JTBToolkit.makeNodeToken(n23); }
+            { n21.addNode(n22); }
+            n24=Ident()
+            { n21.addNode(n24); }
+            n26=<ARROW> { n25 = JTBToolkit.makeNodeToken(n26); }
+            { n21.addNode(n25); }
+            { n3 = new NodeChoice(n21, 2); }
+         |
+            { n27 = new NodeSequence(3); }
+            n29=<ANYOP> { n28 = JTBToolkit.makeNodeToken(n29); }
+            { n27.addNode(n28); }
+            n30=Ident()
+            { n27.addNode(n30); }
+            n32=<ARROW> { n31 = JTBToolkit.makeNodeToken(n32); }
+            { n27.addNode(n31); }
+            { n3 = new NodeChoice(n27, 3); }
+         |
+            { n33 = new NodeSequence(3); }
+            n35=<COMMA> { n34 = JTBToolkit.makeNodeToken(n35); }
+            { n33.addNode(n34); }
+            n36=Ident()
+            { n33.addNode(n36); }
+            n38=<ARROW> { n37 = JTBToolkit.makeNodeToken(n38); }
+            { n33.addNode(n37); }
+            { n3 = new NodeChoice(n33, 4); }
+         )
+         
+      )
+      { n1.addNode(n3); }
+      { n0 = new NodeChoice(n1, 0); }
+   |
+      { n39 = new NodeSequence(2); }
+      n41=<NUMBER> { n40 = JTBToolkit.makeNodeToken(n41); }
+      { n39.addNode(n40); }
+      n43=<ARROW> { n42 = JTBToolkit.makeNodeToken(n43); }
+      { n39.addNode(n42); }
+      { n0 = new NodeChoice(n39, 1); }
+   |
+      { n44 = new NodeSequence(3); }
+      n46=<ANYOP> { n45 = JTBToolkit.makeNodeToken(n46); }
+      { n44.addNode(n45); }
+      (
+         (
+            n49=<NUMBER> { n48 = JTBToolkit.makeNodeToken(n49); }
+            { n47 = new NodeChoice(n48, 0); }
+         |
+            n50=Ident()
+            { n47 = new NodeChoice(n50, 1); }
+         )
+         
+      )
+      { n44.addNode(n47); }
+      n52=<ARROW> { n51 = JTBToolkit.makeNodeToken(n52); }
+      { n44.addNode(n51); }
+      { n0 = new NodeChoice(n44, 2); }
+   |
+      { n53 = new NodeSequence(2); }
+      n55=<LSQBRACE> { n54 = JTBToolkit.makeNodeToken(n55); }
+      { n53.addNode(n54); }
+      (
+         (
+            { n57 = new NodeSequence(5); }
+            n58=Ident()
+            { n57.addNode(n58); }
+            n60=<VERTBAR> { n59 = JTBToolkit.makeNodeToken(n60); }
+            { n57.addNode(n59); }
+            n61=Ident()
+            { n57.addNode(n61); }
+            n63=<RSQBRACE> { n62 = JTBToolkit.makeNodeToken(n63); }
+            { n57.addNode(n62); }
+            n65=<ARROW> { n64 = JTBToolkit.makeNodeToken(n65); }
+            { n57.addNode(n64); }
+            { n56 = new NodeChoice(n57, 0); }
+         |
+            { n66 = new NodeSequence(2); }
+            n68=<RSQBRACE> { n67 = JTBToolkit.makeNodeToken(n68); }
+            { n66.addNode(n67); }
+            n70=<ARROW> { n69 = JTBToolkit.makeNodeToken(n70); }
+            { n66.addNode(n69); }
+            { n56 = new NodeChoice(n66, 1); }
+         )
+         
+      )
+      { n53.addNode(n56); }
+      { n0 = new NodeChoice(n53, 3); }
+   |
+      { n71 = new NodeSequence(6); }
+      n73=<LBRACE> { n72 = JTBToolkit.makeNodeToken(n73); }
+      { n71.addNode(n72); }
+      n74=Ident()
+      { n71.addNode(n74); }
+      (
+         (
+            n77=<COMMA> { n76 = JTBToolkit.makeNodeToken(n77); }
+            { n75 = new NodeChoice(n76, 0); }
+         |
+            n79=<BINOP> { n78 = JTBToolkit.makeNodeToken(n79); }
+            { n75 = new NodeChoice(n78, 1); }
+         )
+         
+      )
+      { n71.addNode(n75); }
+      n80=Ident()
+      { n71.addNode(n80); }
+      n82=<RBRACE> { n81 = JTBToolkit.makeNodeToken(n82); }
+      { n71.addNode(n81); }
+      n84=<ARROW> { n83 = JTBToolkit.makeNodeToken(n84); }
+      { n71.addNode(n83); }
+      { n0 = new NodeChoice(n71, 4); }
+   )
+   
+   { return new LHS(n0); }
 }
 
 Ident Ident() :

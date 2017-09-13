@@ -111,7 +111,7 @@ public class DepthFirstVisitor implements Visitor {
    }
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public void visit(StateList n) {
       n.f0.accept(this);

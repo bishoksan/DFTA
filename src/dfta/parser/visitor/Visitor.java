@@ -72,7 +72,7 @@ public interface Visitor {
    public void visit(States n);
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public void visit(StateList n);
 

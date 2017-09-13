@@ -72,7 +72,7 @@ public interface GJVisitor<R,A> {
    public R visit(States n, A argu);
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public R visit(StateList n, A argu);
 

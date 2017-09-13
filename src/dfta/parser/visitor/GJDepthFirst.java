@@ -145,7 +145,7 @@ public class GJDepthFirst<R,A> implements GJVisitor<R,A> {
    }
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public R visit(StateList n, A argu) {
       R _ret=null;

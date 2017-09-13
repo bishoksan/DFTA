@@ -121,7 +121,7 @@ public class GJVoidDepthFirst<A> implements GJVoidVisitor<A> {
    }
 
    /**
-    * f0 -> ( Ident() )*
+    * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
     */
    public void visit(StateList n, A argu) {
       n.f0.accept(this, argu);

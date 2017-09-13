@@ -59,6 +59,11 @@ public class DeterminiserOpt implements Determiniser {
          System.out.println("Made states");
       }
       dftaTransitions();
+
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> qmin = minimize();
+      System.out.println(qmin);
+      System.out.println("Size of Q_d =" + qd.size() + ": Size of Qmin = " + qmin.size());
+
    }
 
    public boolean dftaStates() {
@@ -410,6 +415,178 @@ public class DeterminiserOpt implements Determiniser {
       return true;
    }
 
+   LinkedHashSet<LinkedHashSet<String>> finalStates() {
+      LinkedHashSet<LinkedHashSet<String>> f = new LinkedHashSet<>();
+      for (LinkedHashSet<String> q : qd) {
+         for (String s : q) {
+            if (idx.finalStates.contains(s)) {
+               f.add(q);
+            }
+         }
+      }
+      return f;
+   }
+
+   // minimization algorithm adapted from Carrasco et al. 2016
+   ArrayList<LinkedHashSet<LinkedHashSet<String>>> minimize() {
+
+      LinkedHashMap<LinkedHashSet<String>, LinkedHashSet<Signature>> sigs = new LinkedHashMap<>();
+      LinkedHashSet<LinkedHashSet<String>> qf = finalStates();
+      Signature dummySig = new Signature(new FuncSymb("#", 1), 1);
+      for (LinkedHashSet<String> q : qd) {
+         sigs.put(q, new LinkedHashSet<>());
+         // For all q ∈ F add (#, 1, 1) to sig(q).
+         if (qf.contains(q)) {
+            sigs.get(q).add(dummySig);
+         }
+      }
+
+      // For all (σ, i1, . . . , im) ∈ Δ add (σ,m, k) to sig(ik) for k = 1, . . . , m.
+      for (PTransition t : deltad) {
+         for (int i = 0; i < t.f.arity; i++) {
+            LinkedHashSet<LinkedHashSet<String>> qis = t.lhs.get(i);
+            for (LinkedHashSet<String> qi : qis) {
+               sigs.get(qi).add(new Signature(t.f, i));
+            }
+         }
+      }
+      //System.out.println("Signatures = " + sigs);
+      // Create a map from Sigma to Delta_d
+      LinkedHashMap<FuncSymb, LinkedHashSet<PTransition>> deltadMap = new LinkedHashMap<>();
+      for (PTransition t : deltad) {
+         if (!deltadMap.containsKey(t.f)) {
+            deltadMap.put(t.f, new LinkedHashSet<PTransition>());
+         }
+         deltadMap.get(t.f).add(t);
+      }
+
+      // Create an empty set Bsig for every different signature sig and for all q ∈ Q add q to set Bsig(q).
+      LinkedHashMap<LinkedHashSet<Signature>, LinkedHashSet<LinkedHashSet<String>>> siginv = new LinkedHashMap<>();
+      for (LinkedHashSet<String> q : qd) {
+         LinkedHashSet<Signature> sigset = sigs.get(q);
+         if (siginv.containsKey(sigset)) {
+            siginv.get(sigset).add(q);
+         } else {
+            siginv.put(sigset, new LinkedHashSet<>());
+            siginv.get(sigset).add(q);
+
+         }
+      }
+      //System.out.println("SigInv = " + siginv);
+      // Set P0 ← (Q) and P1 ← {Bs : Bs ≠ ∅}.
+      ArrayList<LinkedHashSet<LinkedHashSet<String>>> p = new ArrayList<>();
+      for (LinkedHashSet<Signature> s : siginv.keySet()) {
+         p.add(new LinkedHashSet<>(siginv.get(s)));
+      }
+      // Enqueue in K the first element from every class in P1
+      ArrayList<LinkedHashSet<String>> k = new ArrayList<>();
+      for (LinkedHashSet<LinkedHashSet<String>> pi : p) {
+         k.add(new ArrayList<LinkedHashSet<String>>(pi).get(0));
+      }
+      while (!k.isEmpty()) {
+         System.out.println("Iteration p = " + p.size() + ": k = " + k.size());
+         //System.out.println("Iteration p = " + p + ": k = " + k);
+
+         // (a) Remove the first state q in K.
+         LinkedHashSet<String> q = k.remove(0);
+         LinkedHashSet<LinkedHashSet<String>> qi, qi1, phi_q;
+         // (b) For all (σ, i1, . . . , im, j) ∈ Δ such that j ∼ q and for all k ≤ m
+         for (FuncSymb f : idx.sigma) {
+            System.out.println(f + ": " + deltadMap.get(f).size() + " transitions");
+            for (PTransition t : deltadMap.get(f)) {
+               if (congruent(p, q, t.q0)) {
+                  for (int i = 0; i < f.arity; i++) {
+                     qi = t.lhs.get(i);
+                     for (LinkedHashSet<String> qij : qi) {
+                        int r = equivClass(p, qij);
+                        if (p.get(r).size() > 1) { // can be split
+                           ArrayList<LinkedHashSet<String>> prList = new ArrayList<>(p.get(r));
+                           LinkedHashSet<String> next_qij;
+                           if (prList.indexOf(qij) < prList.size() - 1) {
+                              next_qij = prList.get(prList.indexOf(qij) + 1);
+                           } else {
+                              next_qij = prList.get(0);
+                           }
+                           ArrayList<LinkedHashSet<LinkedHashSet<String>>> phi_q_new = new ArrayList<>();
+                           for (int l = 0; l < p.size(); l++) {
+                              phi_q_new.add(new LinkedHashSet<>());
+                           }
+                           // Find transitions f(i1, . . . , ik', . . . , im) -> j where /∼ j and ik ~ ik'
+                           for (PTransition t1 : deltadMap.get(f)) {
+                              if (t1.lhs.get(i).contains(next_qij)) {
+                                 if (!congruent(p, q, t1.q0)) {
+                                    qi1 = t1.lhs.get(i);
+                                    phi_q = new LinkedHashSet<>(p.get(r));
+                                    phi_q.retainAll(qi1);
+                                    if (!phi_q.isEmpty()) {
+                                       int j = 0;
+                                       boolean split = true;
+                                       // check whether t and t1 args overlap
+                                       while (j < f.arity && split) {
+                                          if (j != i) {
+                                             split = split && nonEmptyIntersect(t.lhs.get(j), t1.lhs.get(j));
+                                          }
+                                          j++;
+                                       }
+                                       if (split) {
+                                          // add each element of phi_q to the new equivalence class
+                                          LinkedHashSet<LinkedHashSet<String>> e = phi_q_new.get(equivClass(p, t1.q0));
+                                          for (LinkedHashSet<String> qk : phi_q) {
+                                             if (!e.contains(qk)) {
+                                                e.add(qk);
+                                             }
+                                          }
+                                       }
+                                    }
+                                 }
+                              }
+                           }
+
+                           // replace phi[q] with the partitions in pi_new
+                           //System.out.println("Queue element: "+q);
+                           //System.out.println("Old equiv. class of "+qij+": "+p.get(r));
+                           //System.out.println("New equiv. classes: "+phi_q_new);
+                           LinkedHashSet<LinkedHashSet<String>> oldEquivClass = p.remove(r);
+                           for (LinkedHashSet<LinkedHashSet<String>> newEquivClass : phi_q_new) {
+                              if (!newEquivClass.isEmpty()) {
+                                 p.add(newEquivClass);
+                                 oldEquivClass.removeAll(newEquivClass);
+                                 ArrayList<LinkedHashSet<String>> newList = new ArrayList<>(newEquivClass);
+                                 // Add to K the first element from every subset created 
+                                 if (!k.contains(newList.get(0))) {
+                                    k.add(newList.get(0));
+                                 }
+                              }
+                           }
+                           // put back what is left of the original equiv class
+                           if (!oldEquivClass.isEmpty()) {
+                              p.add(oldEquivClass);
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      /*
+
+       2. While K is not empty
+       (a) Remove the first state q in K.
+       (b) For all (σ, i1, . . . , im, j) ∈ Δ such that j ∼n q and for all k ≤ m
+       i. If δm(σ, i1, . . . , nextn(ik), . . . , im) /∼n j then
+       A. Create Pn+1 from Pn by splitting Φn[ik] into so many subsets as different classes Φn[δm(σ, i1, ., i'k, .., im)] are found for all i'k ∈ Φn[ik].
+       B. Add to K the first element from every subset created at the previous step.
+       C. Set n ← n + 1.
+       3. Output (Qmin,Σ,Δmin, Fmin) with
+       – Qmin = {Φn[q] : q ∈ Q};
+       – Fmin = {Φn[q] : q ∈ F};
+       – Δmin = {(σ, Φn[i1], . . . ,Φn[im], Φn[j]) : (σ, i1, . . . , im, j) ∈ Δ ∧ Φn[j] ≠ Φn[⊥]}.
+       */
+      return p;
+   }
+
 // check inclusion between states in the input FTA
    @Override
    public boolean includes(String q1, String q2) {
@@ -653,17 +830,15 @@ public class DeterminiserOpt implements Determiniser {
       }
       System.out.print(deltad.size() + ", ");
    }
-   
+
    public void showStatsApp(JTextArea ja) {
 
-        ja.append("Number of input FTA states = " + idx.qs.size() + "\n");
-        ja.append("Number of input FTA transitions = " + idx.delta.size() + "\n");
-        ja.append("Number of DFTA states = " + qd.size() + "\n");
-        ja.append("Number of DFTA transitions = " + deltad.size() + "\n");
-    }
+      ja.append("Number of input FTA states = " + idx.qs.size() + "\n");
+      ja.append("Number of input FTA transitions = " + idx.delta.size() + "\n");
+      ja.append("Number of DFTA states = " + qd.size() + "\n");
+      ja.append("Number of DFTA transitions = " + deltad.size() + "\n");
+   }
 
-
-   
    public LinkedHashSet<LinkedHashSet<String>> getQd() {
       return qd;
    }
@@ -719,6 +894,31 @@ public class DeterminiserOpt implements Determiniser {
          }
       }
       return result;
+   }
+
+   private boolean congruent(ArrayList<LinkedHashSet<LinkedHashSet<String>>> p, LinkedHashSet<String> q, LinkedHashSet<String> q0) {
+      return (equivClass(p, q) == equivClass(p, q0));
+   }
+
+   private int equivClass(ArrayList<LinkedHashSet<LinkedHashSet<String>>> p, LinkedHashSet<String> q) {
+      int i = 0;
+      int n = p.size();
+      while (i < n) {
+         if (p.get(i).contains(q)) {
+            return (i);
+         }
+         i++;
+      }
+      return -1;
+   }
+
+   private boolean nonEmptyIntersect(LinkedHashSet<LinkedHashSet<String>> qi, LinkedHashSet<LinkedHashSet<String>> qj) {
+      for (LinkedHashSet<String> s : qi) {
+         if (qj.contains(s)) {
+            return true;
+         }
+      }
+      return false;
    }
 
 }

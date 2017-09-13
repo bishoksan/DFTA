@@ -36,6 +36,7 @@ public class DeterminiserApp extends javax.swing.JDialog {
    File file;
    private Component JDialog1;
    String outputFile;
+   Determiniser det;
 
    public DeterminiserApp(java.awt.Frame parent, boolean modal) {
       super(parent, modal);
@@ -324,7 +325,7 @@ public class DeterminiserApp extends javax.swing.JDialog {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
        // TODO add your handling code here:
        FTAParser t;
-       Determiniser det;
+       
        if (file == null) {
           System.out.println("input file missing, plese select a file");
           //exit(0);
@@ -354,10 +355,10 @@ public class DeterminiserApp extends javax.swing.JDialog {
 
           //show stats
           det.showStatsApp(jTextArea1);
-          outputFile = "/tmp/" + file.getName() + ".dfta";
-          try (PrintStream output = new PrintStream(new File(outputFile))) {
-             det.printDfta(output, output);
-          }
+          //outputFile = "/tmp/" + file.getName() + ".dfta";
+          //try (PrintStream output = new PrintStream(new File(outputFile))) {
+          //   det.printDfta(output, output);
+          //}
           jButton3.setEnabled(true);
 
        } catch (FileNotFoundException ex) {
@@ -382,10 +383,14 @@ public class DeterminiserApp extends javax.swing.JDialog {
        if (returnVal == JFileChooser.APPROVE_OPTION) {
           try {
              File destFile = fc1.getSelectedFile();
-             File sourceFile = new File(outputFile);
-             System.out.println("source dest " + sourceFile.getAbsolutePath() + " " + destFile.getAbsolutePath());
-             Determinise.copyFile(sourceFile, destFile);
-             System.out.println("file copied succ");
+             //File sourceFile = new File(outputFile);
+             //System.out.println("source dest " + sourceFile.getAbsolutePath() + " " + destFile.getAbsolutePath());
+             //Determinise.copyFile(sourceFile, destFile);
+             //System.out.println("file copied succ");
+             PrintStream output = new PrintStream(destFile);
+             det.printDfta(output, output);
+          //}
+             
           } catch (Exception ex) {
              ex.printStackTrace();
           }

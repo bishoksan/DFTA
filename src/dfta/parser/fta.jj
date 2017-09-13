@@ -146,7 +146,7 @@ void States() :
 
 void StateList() :
 { }
-{ (Ident())* 
+{ (Ident() (<COLON> <NUMBER>)?)* 
 }
 
 void FinalStates() :

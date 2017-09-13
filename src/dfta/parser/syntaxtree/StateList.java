@@ -6,7 +6,7 @@ package dfta.parser.syntaxtree;
 
 /**
  * Grammar production:
- * f0 -> ( Ident() )*
+ * f0 -> ( Ident() ( <COLON> <NUMBER> )? )*
  */
 public class StateList implements Node {
    public NodeListOptional f0;
