@@ -60,10 +60,10 @@ public class DeterminiserOpt implements Determiniser {
       }
       dftaTransitions();
 
-      ArrayList<LinkedHashSet<LinkedHashSet<String>>> qmin = minimize();
+      /*ArrayList<LinkedHashSet<LinkedHashSet<String>>> qmin = minimize();
       System.out.println(qmin);
-      System.out.println("Size of Q_d =" + qd.size() + ": Size of Qmin = " + qmin.size());
-
+      System.out.println("Size of Q_d = " + qd.size() + ": Size of Qmin = " + qmin.size());
+*/
    }
 
    public boolean dftaStates() {
@@ -485,14 +485,13 @@ public class DeterminiserOpt implements Determiniser {
       }
       while (!k.isEmpty()) {
          System.out.println("Iteration p = " + p.size() + ": k = " + k.size());
-         //System.out.println("Iteration p = " + p + ": k = " + k);
 
          // (a) Remove the first state q in K.
          LinkedHashSet<String> q = k.remove(0);
          LinkedHashSet<LinkedHashSet<String>> qi, qi1, phi_q;
          // (b) For all (σ, i1, . . . , im, j) ∈ Δ such that j ∼ q and for all k ≤ m
          for (FuncSymb f : idx.sigma) {
-            System.out.println(f + ": " + deltadMap.get(f).size() + " transitions");
+            //System.out.println(f + ": " + deltadMap.get(f).size() + " transitions");
             for (PTransition t : deltadMap.get(f)) {
                if (congruent(p, q, t.q0)) {
                   for (int i = 0; i < f.arity; i++) {
@@ -543,9 +542,7 @@ public class DeterminiserOpt implements Determiniser {
                            }
 
                            // replace phi[q] with the partitions in pi_new
-                           //System.out.println("Queue element: "+q);
-                           //System.out.println("Old equiv. class of "+qij+": "+p.get(r));
-                           //System.out.println("New equiv. classes: "+phi_q_new);
+                          
                            LinkedHashSet<LinkedHashSet<String>> oldEquivClass = p.remove(r);
                            for (LinkedHashSet<LinkedHashSet<String>> newEquivClass : phi_q_new) {
                               if (!newEquivClass.isEmpty()) {
@@ -569,21 +566,7 @@ public class DeterminiserOpt implements Determiniser {
             }
          }
       }
-
-      /*
-
-       2. While K is not empty
-       (a) Remove the first state q in K.
-       (b) For all (σ, i1, . . . , im, j) ∈ Δ such that j ∼n q and for all k ≤ m
-       i. If δm(σ, i1, . . . , nextn(ik), . . . , im) /∼n j then
-       A. Create Pn+1 from Pn by splitting Φn[ik] into so many subsets as different classes Φn[δm(σ, i1, ., i'k, .., im)] are found for all i'k ∈ Φn[ik].
-       B. Add to K the first element from every subset created at the previous step.
-       C. Set n ← n + 1.
-       3. Output (Qmin,Σ,Δmin, Fmin) with
-       – Qmin = {Φn[q] : q ∈ Q};
-       – Fmin = {Φn[q] : q ∈ F};
-       – Δmin = {(σ, Φn[i1], . . . ,Φn[im], Φn[j]) : (σ, i1, . . . , im, j) ∈ Δ ∧ Φn[j] ≠ Φn[⊥]}.
-       */
+      
       return p;
    }
 

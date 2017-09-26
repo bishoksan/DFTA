@@ -85,7 +85,6 @@ public class DeterminiserTextBook implements Determiniser {
                   if (!q0.isEmpty()) {
                      qd.add(q0);
                      newTransition |= addTransition(f, q0, qtuple);
-                     DTransition d = new DTransition(f, q0, qtuple);
                   }
                }
             }
