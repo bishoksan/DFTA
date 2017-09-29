@@ -232,7 +232,7 @@ public class DeterminiserTextBook implements Determiniser {
          System.out.println();
          System.out.print("Number of DFTA transitions = ");
       }
-      System.out.print(deltad.size() + ", ");
+      System.out.println(deltad.size() + ", ");
    }
    
    public void showStatsApp(JTextArea ja) {

@@ -179,8 +179,8 @@ public class Determinise {
       System.out.println("Finite Tree Automata (FTA) determinisation");
       System.out.println();
       System.out.println("Usage:");
-      System.out.println("java -jar determinise.jar [-help][-h] ");
-      System.out.println("java -jar determinise.jar <ftafile> [-text][-dc][-show][-any][-datalog][-o <outfile>]");
+      System.out.println("java -jar DFTA.jar [-help][-h] ");
+      System.out.println("java -jar DFTA.jar <ftafile> [-text][-dc][-show][-any][-datalog][-o <outfile>]");
       System.out.println();
       System.out.println("-help, -h -- print this message and ignore any other arguments");
       System.out.println("-text     -- use the textbook algorithm (default is optimised algorithm)");

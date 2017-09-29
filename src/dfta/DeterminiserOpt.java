@@ -811,7 +811,7 @@ public class DeterminiserOpt implements Determiniser {
          System.out.println();
          System.out.print("Number of DFTA product transitions = ");
       }
-      System.out.print(deltad.size() + ", ");
+      System.out.println(deltad.size() + ", ");
    }
 
    public void showStatsApp(JTextArea ja) {
