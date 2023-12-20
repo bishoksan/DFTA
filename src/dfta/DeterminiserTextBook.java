@@ -14,7 +14,7 @@ public class DeterminiserTextBook implements Determiniser {
    boolean verbose;
 
    LinkedHashSet<LinkedHashSet<String>> qd = new LinkedHashSet<>();
-   ArrayList<DTransition> deltad = new ArrayList<>();
+   final LinkedHashSet<DTransition> deltad = new LinkedHashSet<>();
 
    public DeterminiserTextBook(LinkedHashSet transitions, LinkedHashSet finalStates, boolean any, boolean verbose) {
       idx = new Indices(transitions, finalStates);
@@ -123,20 +123,10 @@ public class DeterminiserTextBook implements Determiniser {
       }
       return result;
    }
-
+   
    boolean addTransition(FuncSymb f, LinkedHashSet<String> q0, ArrayList<LinkedHashSet<String>> lhs) {
-      DTransition d1;
-      for (DTransition deltad1 : deltad) {
-         d1 = deltad1;
-         if (d1.f.equals(f)
-                 && d1.lhs.equals(lhs)
-                 && d1.q0.equals(q0)) {
-            return false;
-         }
-      }
-      deltad.add(new DTransition(f, q0, lhs));
-      return true;
-   }
+        return deltad.add(new DTransition(f, q0, lhs));
+    }
 
 // check inclusion between states in the input FTA
    @Override
@@ -247,7 +237,7 @@ public class DeterminiserTextBook implements Determiniser {
       return qd;
    }
 
-   public ArrayList<DTransition> getDeltad() {
+   public LinkedHashSet<DTransition> getDeltad() {
       return deltad;
    }
 
